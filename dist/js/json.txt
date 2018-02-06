@@ -1,0 +1,58 @@
+[
+  {
+    "Agricultor": "AGRO DESERT ",
+    "CodigoAgricultor": 28,
+    "Cultivo": "ROMA TOMATO",
+    "Tamano": "XXL",
+    "Etiqueta": "TRIPLE H",
+    "Presentacion": "25 LBS",
+    "Cantidad": 77,
+    "PrecioPromedio": 15.500000,
+    "Importe": 1268.500000
+  },
+  {
+    "Agricultor": "FELIPE CAMPUZANO ",
+    "CodigoAgricultor": 81,
+    "Cultivo": "ROMA TOMATO",
+    "Tamano": "M",
+    "Etiqueta": "TRIPLE H",
+    "Presentacion": "25 LBS",
+    "Cantidad": 727,
+    "PrecioPromedio": 15.500000,
+    "Importe": 11268.500000
+  },
+  {
+    "Agricultor": "BERRY VEG DE BAJA ",
+    "CodigoAgricultor": 138,
+    "Cultivo": "ROMA TOMATO",
+    "Tamano": "XL",
+    "Etiqueta": "JERRY'S",
+    "Presentacion": "25 LBS",
+    "Cantidad": 727,
+    "PrecioPromedio": 15.500000,
+    "Importe": 11268.500000
+  },
+  {
+    "Agricultor": "AGRICOLA ERAB RICARDO ANTILLON ",
+    "CodigoAgricultor": 155,
+    "Cultivo": "ROMA TOMATO",
+    "Tamano": "XL",
+    "Etiqueta": "TRIPLE H",
+    "Presentacion": "25 LBS",
+    "Cantidad": 727,
+    "PrecioPromedio": 15.500000,
+    "Importe": 11268.500000
+  },
+  {
+    "Agricultor": "BERRY VEG DE BAJA ",
+    "CodigoAgricultor": 138,
+    "Cultivo": "SERRANO PEPPER",
+    "Tamano": "M",
+    "Etiqueta": "TRIPLE H",
+    "Presentacion": "25 LBS",
+    "Cantidad": 727,
+    "PrecioPromedio": 25.500000,
+    "Importe": 18538.50
+  }
+  
+]

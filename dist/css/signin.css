@@ -1,0 +1,126 @@
+body {
+  padding-top: 90px;
+  background-image: url(../../images/tomate1.jpeg);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  height: 100vh;
+  background-position: center;
+}
+
+
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+  margin-bottom: 10px;
+  text-align: center;
+}
+.form-signin .checkbox {
+  font-weight: normal;
+}
+.form-signin .form-control {
+  position: relative;
+  height: auto;
+  padding: 10px;
+  font-size: 14px;
+
+  border-left: 0px !important;
+  border-right: 0px;
+  border-top: 0px;
+  border-bottom:0px solid #C0C0C0;
+  text-align: center;
+
+  border-radius: 0px !important;
+  -webkit-box-shadow: none !important;
+
+}
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+.form-signin img{
+  margin-bottom: 30px;  
+}
+.form-signin input[type="email"] {
+  margin-bottom: 10px;  
+}
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+}
+
+
+.opciones {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+  text-align: center;
+  margin-top: -20px;
+}
+.opciones a {
+  color: #848484;
+}
+
+
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.88);
+  padding-top: 30px;
+  padding-bottom: 30px;
+  
+  border-radius: 10px;
+}
+
+
+#loader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -59px;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Add animation to "page content" */
+.animate-bottom {
+  position: relative;
+  -webkit-animation-name: animatebottom;
+  -webkit-animation-duration: 1s;
+  animation-name: animatebottom;
+  animation-duration: 1s
+}
+
+@-webkit-keyframes animatebottom {
+  from { left:-100px; opacity:0 } 
+  to { left:0px; opacity:1 }
+}
+
+@keyframes animatebottom { 
+  from{ left:-100px; opacity:0 } 
+  to{ left:0; opacity:1 }
+}
+
+#main {
+  display: none;
+  text-align: center;
+}

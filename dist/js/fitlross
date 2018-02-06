@@ -1,0 +1,47 @@
+var rawtData = [{"_id":"5983c7aeab0819000416d43e","NombreBodega":"SMARTCOLD","Llegada":null,"CodigoAgricultor":171,"Nombre":"PARRAS VALLEY ","CodigoCarga":20465,"CodigoProducto":"TROMPVY3MCAR25L","Cultivo":"Roma tomato","Etiqueta":"PARRAS VALLEY","Tamano":"M","Presentacion":"25 LBS","Mercado":"EXP","fechaembarque":"02/08/2017","fecharecepcion":"","fechaOrdenado":"","fechaDespachado":"","FolioPickup":null,"NombreProducto":"TOMATE ROMA PARRAS VALLEY MD 25 LBS*","Publicado":false,"Precio":null,"Embarcado":160,"Recibido":0,"Piso":0,"Ordenado":0,"Despachado":0,"EmbarcadoHOY":0,"RecibidoHOY":0,"OrdenadoHOY":0,"DespachadoHOY":0},
+                {"_id":"5983c7aeab0819000416d318","NombreBodega":"SMARTCOLD","Llegada":null,"CodigoAgricultor":171,"Nombre":"PARRAS VALLEY ","CodigoCarga":19510,"CodigoProducto":"TSALPVYLCAR25L","Cultivo":"Roma","Etiqueta":"PARRAS VALLEY","Tamano":"L","Presentacion":"25 LBS","Mercado":"EXP","fechaembarque":"25/05/2017","fecharecepcion":"25/05/2017","fechaOrdenado":"24/05/2017","fechaDespachado":"25/05/2017","FolioPickup":null,"NombreProducto":"TOMATE ROMA PARRAS VALLEY LG 25 LBS","Publicado":false,"Precio":null,"Embarcado":80,"Recibido":80,"Piso":0,"Ordenado":80,"Despachado":80,"EmbarcadoHOY":0,"RecibidoHOY":0,"OrdenadoHOY":0,"DespachadoHOY":0}
+               ];
+
+var groupBy = function (miarray, prop) {
+    return miarray.reduce(function(groups, item) {
+        var val = item[prop];
+        groups[val] = groups[val] || {
+          
+		Cultivo: item.Cultivo, 
+		_id:item._id, 
+		"NombreBodega":item.NombreBodega,
+		"Llegada":item.Llegada,
+		"CodigoAgricultor":item.CodigoAgricultor,
+		"Nombre":item.Nombre,
+		"CodigoCarga":item.CodigoCarga,
+		"CodigoProducto":item.CodigoProducto,
+		"Cultivo":item.Cultivo,
+		"Etiqueta":item.Etiqueta,
+		"Tamano":item.Tamano,
+		"Presentacion":item.Presentacion,
+		"Mercado":item.Mercado,
+		"fechaembarque":item.fechaembarque,
+		"fecharecepcion":item.fecharecepcion,
+		"fechaOrdenado":item.fechaOrdenado,
+		"fechaDespachado":item.fechaDespachado,
+		"FolioPickup":item.FolioPickup,
+		"NombreProducto":item.NombreProducto,
+		"Publicado":item.Publicado,
+		"Precio":item.Precio,
+		"Embarcado":item.Embarcado,
+		"Recibido":item.Recibido,
+		"Piso":item.Piso,
+		"Ordenado":item.Ordenado,
+		"Despachado":item.Despachado,
+		"EmbarcadoHOY":item.EmbarcadoHOY,
+		"RecibidoHOY":item.RecibidoHOY,
+		"OrdenadoHOY":item.OrdenadoHOY,
+		"DespachadoHOY":item.DespachadoHOY};
+		        
+		        groups[val].Cultivo = item.Cultivo;
+		        return groups
+		    }, {});
+		}
+
+//console.log(JSON.stringify(groupBy(rawtData,'Cultivo')));
+console.log(groupBy(rawtData,'Cultivo'));

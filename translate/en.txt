@@ -1,0 +1,35 @@
+key_spanish=>Spanish
+key_english=>English
+key_inventory=> Inventory
+key_loads=> Loads
+key_sales=> Sales
+key_commodity_eval=> Commodity Eval
+key_financial=> Financial Statments
+key_new_tripleh=> News Triple H
+key_about=> About
+key_loguot=> Log Out
+key_welcome=> Welcome
+key_lagricultor=> Filter by grower
+key_lbodega=> Filter by warehouse
+key_lcommodity=> Filter by commodity
+key_select=>  -- Select an option -- 
+key_filter_no_filter=> No Filter
+key_filter_all=> All
+key_total_shipped=> Total Shipped=> 
+key_total_dispatched=> Total Dispatched=> 
+key_detail=> Detail
+key_commodity=> Commodity/Summary
+key_commodity_label=> Commodity/Label
+key_commodity_label_size=> Commodity/Label/Size
+key_sales=> Sales
+key_lt_commodity=> Commodity
+key_lt_transit=> In Transit
+key_lt_received=> Received
+key_lt_available=> Available
+key_lt_assigned=> Assigned
+key_lt_dispatched=> Dispatched
+key_lt_avgprice=> Avg Price
+key_lt_total_shipped=> Total Shipped
+key_lt_total_dispatched=> Total Dispatched
+key_lt_price_sales=> Price
+key_no-picture=>No pictures available
