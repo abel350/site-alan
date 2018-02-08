@@ -122,12 +122,12 @@ if(!isset($_SESSION['usuario']) and $_SESSION['estado'] != 'Autenticado') {
             </div>               
           </div> 
           <div class="col-lg-3 col-md-6 col-sm-12">
-            <div class="con-json">    
-              <label id="lcommodity" for="cultivo">Filter by commodity</label>
+            <div class="con-json">
+              <label id="lbodega" for="cultivo">Filter by commodity</label>    
               <select id="cultivo" name="cultivo" class="form-control">                  
               </select>
             </div>               
-          </div>
+          </div> 
           <div class="col-lg-3 col-md-6 col-sm-12">
             <div class="con-json">
               <label id="lcontract" for="contract">Filter by Contract</label>    
@@ -245,7 +245,7 @@ if(!isset($_SESSION['usuario']) and $_SESSION['estado'] != 'Autenticado') {
   <script src="translate/traducir_sales_date.js"></script>
   <script src="http://malsup.github.io/jquery.blockUI.js"></script>
   <script src="https://unpkg.com/i18next@8.4.3/i18next.min.js"></script>
-  <script src="dist/js/facturas-venta.js"></script>
+  <script src="dist/js/facturas-venta-fecha-factura.js"></script>
   <script src="dist/js/menu-left.js"></script>
 
 

@@ -415,7 +415,7 @@ function tabla(ventas){
 
       //var sale = _.groupBy(sales[frontera], 'Cultivo');
       var sale = _.groupBy(sales[frontera], function(d) {
-        return d.Cultivo + "-" + d.FechaVenta;
+        return d.Cultivo + "-" + d.FechaFacturado;
       });
       $.each(sale, function(i,item) {
         console.log(item);
@@ -430,7 +430,7 @@ function tabla(ventas){
         
 
         html+="<tr id='border' class='green-light'>";
-        html+="<td>Border: "+item[0].FechaVenta+"</td>";
+        html+="<td>Border: "+item[0].FechaFacturado+"</td>";
         html+="<td></td>";
         html+="<td ></td>";
         html+="<td ></td>";

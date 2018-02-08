@@ -78,6 +78,8 @@ if(!isset($_SESSION['usuario']) and $_SESSION['estado'] != 'Autenticado') {
                 <ul class="dropdown-menu">
                   <li><a href="sales.php">Price</a></li>
                   <li><a tabindex="-1" href="facturas-venta.php">Price by Load</a></li>
+                  <li><a tabindex="-1" href="facturas-venta-fecha.php">Price by Sold Date</a></li>
+                  <li><a tabindex="-1" href="facturas-venta-fecha-factura.php">Price by Invoice Date</a></li>
                 </ul>
               </li>  
               <li><a id="commodity_eval" href ="#" data-toggle="tooltip" title="Soon" data-placement="right">Commodity Control</a></li>
