@@ -365,15 +365,15 @@ function tabla(ventas){
         html+="<th>"+"Final Amount"+"</th>";
 
       }else if(idioma == "es"){
-        html+="<th>"+"Commodity"+"</th>";
-        html+="<th>"+"Loads"+"</th>";
-        html+="<th>"+"# Sale"+"</th>";
+        html+="<th>"+"Cultivo"+"</th>";
+        html+="<th>"+"Cargas"+"</th>";
+        html+="<th>"+"# Venta"+"</th>";
         html+="<th></th>";
-        html+="<th>"+"Quantity"+"</th>";
-        html+="<th>"+"Invoice Price"+"</th>";
+        html+="<th>"+"Cantidad"+"</th>";
+        html+="<th>"+"Precio Facturado"+"</th>";
 
-        html+="<th>"+"Final Price"+"</th>";
-        html+="<th>"+"Final Amount"+"</th>";
+        html+="<th>"+"Precio liquidado"+"</th>";
+        html+="<th>"+"Importe liquidado"+"</th>";
       }
 
       html+="</tr>";
@@ -381,7 +381,11 @@ function tabla(ventas){
       html+="<tbody>";
 
       html+="<tr id='border' class='blue'>";
-      html+="<td>Border: "+item[0].Frontera+"</td>";
+      if(idioma == "en"){
+        html+="<td>Border: "+item[0].Frontera+"</td>";
+      }if(idioma == "es"){
+        html+="<td>Frontera: "+item[0].Frontera+"</td>";
+      }
       html+="<td></td>";
       html+="<td ></td>";
       html+="<td>Total</td>";
@@ -393,7 +397,11 @@ function tabla(ventas){
       html+="</tr>"; 
 
       html+="<tr id='border' class='green'>";
-      html+="<td>Commodity: "+item[0].Cultivo+"</td>";
+      if(idioma == "en"){
+        html+="<td>Commodity: "+item[0].Cultivo+"</td>";
+      }if(idioma == "es"){
+        html+="<td>Cultivo: "+item[0].Cultivo+"</td>";
+      }
       html+="<td></td>";
       html+="<td ></td>";
       html+="<td ></td>";
@@ -415,22 +423,22 @@ function tabla(ventas){
 
       //var sale = _.groupBy(sales[frontera], 'Cultivo');
       var sale = _.groupBy(sales[frontera], function(d) {
-        return d.Cultivo + "-" + d.FechaVenta;
+        return d.Producto + "-" + d.FechaVenta + "-" + d.FolioVenta;
       });
       $.each(sale, function(i,item) {
-        console.log(item);
-        var otro = _.groupBy(item, 'FechaVenta');
-
         sum_sin_facturar_beige=0;
         sum_cantidad_frontera_beige=0;
         sum_facturado_beige=0;
         sum_precio_facturado_beige=0;
         sum_precio_liquidado_beige=0;
-
-        
+        final_amount=0;
 
         html+="<tr id='border' class='green-light'>";
-        html+="<td>Border: "+item[0].FechaVenta+"</td>";
+        if(idioma == "en"){
+          html+="<td>Sold Date: "+item[0].FechaVenta+"</td>";
+        }if(idioma == "es"){
+          html+="<td>Fecha de Venta: "+item[0].FechaVenta+"</td>";
+        }
         html+="<td></td>";
         html+="<td ></td>";
         html+="<td ></td>";
@@ -438,7 +446,35 @@ function tabla(ventas){
         html+="<td ></td>";
         html+="<td ></td>";
         html+="<td ></td>";
+        html+="</tr>";
+        for (var j = 0; j < item.length; j++) {
+
+          final_amount = final_amount + item[j].ImporteLiquidado;
+          sum_invoiced_frontera = sum_invoiced_frontera + item[j].ImporteFacturado;
+
+          sum_cantidad_frontera_beige = sum_cantidad_frontera_beige + item[j].Cantidad;
+          sum_facturado_beige = sum_facturado_beige + item[j].CantidadFacturado;
+
+          sum_precio_facturado_beige = item[j].ImporteFacturado / item[j].Cantidad;
+          sum_precio_liquidado_beige = item[j].ImporteLiquidado / item[j].Cantidad;
+        }
+        
+        
+        html+="<tr class=''>";
+        /*html+="<td class='white'></td>";
+        html+="<td class='white'></td>";*/
+        html+="<td>"+item[0].Producto;+"</td>";
+        html+="<td></td>";
+        html+="<td>"+item[0].FolioVenta;+"</td>";
+        html+="<td></td>";
+        html+="<td>"+numberWithCommas(sum_cantidad_frontera_beige);+"</td>";
+        html+="<td>"+numberWithCommas(sum_precio_facturado_beige);+"</td>";
+        
+        html+="<td>"+numberWithCommas(sum_precio_liquidado_beige,2);+"</td>";
+        html+="<td>"+numberWithCommas(final_amount,2);+"</td>";
         html+="</tr>"; 
+
+
         for (var j = 0; j < item.length; j++) {
 
           final_price = final_price + item[j].PrecioLiquidado;
@@ -454,33 +490,19 @@ function tabla(ventas){
           sum_sin_facturar_beige = sum_sin_facturar_beige + item[j].CantidadSinFacturar;
           sum_facturado_beige = sum_facturado_beige + item[j].CantidadFacturado;
 
-          
-
-          html+="<tr>";
-          html+="<td>"+item[j].Producto;+"</td>";
-          html+="<td>"+item[j].CodigoCarga;+"</td>";
-          html+="<td>"+item[j].FolioVenta;+"</td>";
+          html+="<tr class='blue-light'>";
+          html+="<td class='white'></td>";
+          html+="<td class='white'></td>";
+          html+="<td>Carga: "+item[j].CodigoCarga;+"</td>";
           html+="<td></td>";
           html+="<td>"+item[j].Cantidad;+"</td>";
           html+="<td>"+numberWithCommas(precio_facturado,2);+"</td>";
           
           html+="<td>"+numberWithCommas(precio_liquidado,2);+"</td>";
           html+="<td>"+item[j].ImporteLiquidado;+"</td>";
+          html+="</tr>";
         }
-        sum_precio_facturado_beige = sum_invoiced_frontera / sum_cantidad_frontera_beige;
-        sum_precio_liquidado_beige = final_amount / sum_cantidad_frontera_beige;
-        html+="</tr>";
-        html+="<tr class='beige'>";
-        html+="<td class='white'></td>";
-        html+="<td class='white'></td>";
-        html+="<td>"+item[0].FechaVenta+" Total</td>";
-        html+="<td></td>";
-        html+="<td>"+numberWithCommas(sum_cantidad_frontera_beige);+"</td>";
-        html+="<td>"+numberWithCommas(sum_precio_facturado_beige);+"</td>";
         
-        html+="<td>"+numberWithCommas(sum_precio_liquidado_beige,2);+"</td>";
-        html+="<td>"+numberWithCommas(final_amount,2);+"</td>";
-        html+="</tr>"; 
       })
 
       html+="</tbody>";
@@ -596,7 +618,7 @@ $("#bodega").change(function(){
 
   bodega = $("#bodega option:selected").val();
   cultivo = $("#cultivo option:selected").val();
-/*  var my_json = JSON.parse(data_server)*/
+  /*  var my_json = JSON.parse(data_server)*/
   if (bodega == "todo" && cultivo == "todo") {
     tabla(data_server_filtro_agricultor);
   }else

@@ -519,6 +519,11 @@ td.gray {
   color: #fff;
 }
 
+.blue-light{
+  background: #DCEAF8 !important;
+  color: #000;
+}
+
 .green{
   background: #1C632A !important;
   font-weight:bold;
