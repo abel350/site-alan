@@ -620,3 +620,19 @@ th:first-child div{
   .table-striped>tbody>tr:nth-of-type(odd) {
     background-color: #D5D5DA;
 }
+
+.parent{cursor:pointer}
+
+.text-left{
+  text-align: left;
+}
+
+
+tbody tr.tr-white:nth-child(odd){
+  background-color: #fff;
+}
+
+#filter-season{
+  text-align: left;
+  float: left;
+}

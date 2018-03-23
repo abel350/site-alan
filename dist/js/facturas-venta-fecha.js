@@ -1,7 +1,24 @@
 var data_ventas
 var data_server;
+var temporadaok;
+
+obtener_temporada(function(season){
+  temporadaok = season;
+})
 obtener_ventas(function(ventas){
-  data_ventas = ventas;
+  if(temporadaok.length > 3){
+    data_ventas = ventas;
+  }else { 
+    data = find_in_object(JSON.parse(ventas), {CodigoTemporada: temporadaok});
+    function find_in_object(my_object, my_criteria){
+      return my_object.filter(function(obj) {
+        return Object.keys(my_criteria).every(function(c) {
+          return obj[c] == my_criteria[c];
+        });
+      });
+    }
+    data_ventas = JSON.stringify(data);
+  }
   fnCallbackAjax(function(agri){
     data_server = agri;
     myFunction();
@@ -252,6 +269,20 @@ function obtener_cultivos(callbackData) {
     },
   }); 
 } 
+
+//Petición para obtener TEMPORADA
+function obtener_temporada(callbackData) {
+  $.ajax({
+    type: 'GET',
+    url: 'recursos/obtener_temporada.php',
+    success:function(data){
+      callbackData(data);
+    },
+  }); 
+}
+
+
+
 var sales ="";
 function tabla(ventas){
   var frontera="";
@@ -260,7 +291,10 @@ function tabla(ventas){
     /*var sales = ventas;*/
     $("#tabla").html(""); 
     var html="";
-    sales = _.groupBy(ventas, 'Frontera');
+    //sales = _.groupBy(ventas, 'Frontera');
+    var sales = _.groupBy(ventas, function(d) {
+      return d.Frontera + "-" + d.Cultivo;
+    });
     console.log(sales);
     var sumtotal_cantidad =0;
 
@@ -303,8 +337,8 @@ function tabla(ventas){
     html+="</thead>";
     html+="</table>";
 
-
     $.each(sales, function(i, item) {
+
       frontera = i;
       var sum_cantidad  =0;
       var sumtotal_importe = 0 ;
@@ -328,31 +362,10 @@ function tabla(ventas){
       var sum_cantidad_facturado_frontera = 0;
 
       var precio_facturado = 0;
-      
-      //TOTALES
-      for (var j = 0; j < item.length; j++) {
-        //TOTALES JSON
-        sumtotal_cantidad = sumtotal_cantidad + item[j].Cantidad;
-        sumtotal_cantidad_sin_facturar = sumtotal_cantidad_sin_facturar + item[j].CantidadSinFacturar;
-        sumtotal_cantidad_facutrado = sumtotal_cantidad_facutrado + item[j].CantidadFacturado;
-
-        sumtotal_importe = sumtotal_importe + item[j].Importe;
-        final_total_price = final_total_price + item[j].ImporteLiquidado;
-        final_total_amount = final_total_amount + item[j].ImporteFacturado;
-
-        //TOTALES FRONTERA
-        sum_cantidad_frontera = sum_cantidad_frontera + item[j].Cantidad;
-        sum_no_invoiced_frontera = sum_no_invoiced_frontera + item[j].ImporteLiquidado;
-        sum_invoiced_frontera = sum_invoiced_frontera + item[j].ImporteFacturado;        
-      }
-
-      total_precio_facturado = final_total_amount/sumtotal_cantidad;
-      total_precio_liquidado =final_total_price / sumtotal_cantidad;     
 
       html+="<table border='1|1' class='table table-striped table-bordered display'>";
       html+="<thead>";
       html+="<tr>";
-
       if(idioma == "en"){
         html+="<th>"+"Commodity"+"</th>";
         html+="<th>"+"Loads"+"</th>";
@@ -375,16 +388,51 @@ function tabla(ventas){
         html+="<th>"+"Precio liquidado"+"</th>";
         html+="<th>"+"Importe liquidado"+"</th>";
       }
-
       html+="</tr>";
       html+="</thead>";
       html+="<tbody>";
+      
+      //TOTALES
+      for (var j = 0; j < item.length; j++) {
+        //TOTALES JSON
+        sumtotal_cantidad = sumtotal_cantidad + item[j].Cantidad;
+        sumtotal_cantidad_sin_facturar = sumtotal_cantidad_sin_facturar + item[j].CantidadSinFacturar;
+        sumtotal_cantidad_facutrado = sumtotal_cantidad_facutrado + item[j].CantidadFacturado;
 
-      html+="<tr id='border' class='blue'>";
+        sumtotal_importe = sumtotal_importe + item[j].Importe;
+        final_total_price = final_total_price + item[j].ImporteLiquidado;
+        final_total_amount = final_total_amount + item[j].ImporteFacturado;
+
+        //TOTALES FRONTERA
+        sum_cantidad_frontera = sum_cantidad_frontera + item[j].Cantidad;
+        sum_no_invoiced_frontera = sum_no_invoiced_frontera + item[j].ImporteLiquidado;
+        sum_invoiced_frontera = sum_invoiced_frontera + item[j].ImporteFacturado;        
+      }
+
+      total_precio_facturado = final_total_amount/sumtotal_cantidad;
+      total_precio_liquidado =final_total_price / sumtotal_cantidad;     
+
+
+      html+="<tr id='border' class='parent blue'>";
       if(idioma == "en"){
         html+="<td>Border: "+item[0].Frontera+"</td>";
       }if(idioma == "es"){
         html+="<td>Frontera: "+item[0].Frontera+"</td>";
+      }
+      html+="<td></td>";
+      html+="<td ></td>";
+      html+="<td></td>";
+      html+="<td ></td>";
+      html+="<td ></td>";
+      html+="<td ></td>";
+      html+="<td ></td>";
+      html+="</tr>"; 
+
+      html+="<tr id='border' class='parent green'>";
+      if(idioma == "en"){
+        html+="<td>Commodity: "+item[0].Cultivo+"</td>";
+      }if(idioma == "es"){
+        html+="<td>Cultivo: "+item[0].Cultivo+"</td>";
       }
       html+="<td></td>";
       html+="<td ></td>";
@@ -396,21 +444,6 @@ function tabla(ventas){
       html+="<td>"+numberWithCommas(final_total_price,2)+"</td>";
       html+="</tr>"; 
 
-      html+="<tr id='border' class='green'>";
-      if(idioma == "en"){
-        html+="<td>Commodity: "+item[0].Cultivo+"</td>";
-      }if(idioma == "es"){
-        html+="<td>Cultivo: "+item[0].Cultivo+"</td>";
-      }
-      html+="<td></td>";
-      html+="<td ></td>";
-      html+="<td ></td>";
-      html+="<td ></td>";
-      html+="<td ></td>";
-      html+="<td ></td>";
-      html+="<td ></td>";
-      html+="</tr>"; 
-
       var sum_cantidad_frontera_beige=0;
       var sum_sin_facturar_beige = 0;
       var sum_facturado_beige = 0;
@@ -420,24 +453,65 @@ function tabla(ventas){
 
       var sum_precio_facturado_beige_2 =0;
 
+      var sale = _.groupBy(sales[frontera], 'FechaVenta');
+      /*var sale = _.groupBy(sales[frontera], function(d) {
+        return d.FechaVenta + "-" + d.FolioVenta;
+      })*/
 
-      //var sale = _.groupBy(sales[frontera], 'Cultivo');
-      var sale = _.groupBy(sales[frontera], function(d) {
+      /*var sale = _.groupBy(sales[frontera], function(d) {
         return d.Producto + "-" + d.FechaVenta + "-" + d.FolioVenta;
-      });
+      });*/
+
+      /*var sale = _.groupBy(sales[frontera], function(d) {
+        return d.FechaVenta + "-" + d.FolioVenta;
+      });*/
+
       $.each(sale, function(i,item) {
+
         sum_sin_facturar_beige=0;
         sum_cantidad_frontera_beige=0;
+
+        sum_cantidad_frontera_beige2=0;
+        sum_facturado_beige2=0;
+        sum_sin_facturar_beige2=0;
+        sum_precio_facturado_beige2=0;
+        sum_precio_liquidado_beige2=0;
+        final_amount2=0;
+        sum_invoiced_frontera2=0;
+        total_ImporteFacturado_json2=0;
+        total_ImporteLiquidado_json2=0;
+        total_precio_facturado_json2=0
+        total_precio_liquidado_json2=0;
+
+
         sum_facturado_beige=0;
         sum_precio_facturado_beige=0;
         sum_precio_liquidado_beige=0;
         final_amount=0;
 
-        html+="<tr id='border' class='green-light'>";
+
+        for (var j = 0; j < item.length; j++) {
+
+          final_amount2 = final_amount2 + item[j].ImporteLiquidado;
+          sum_invoiced_frontera2 = sum_invoiced_frontera2 + item[j].ImporteFacturado;
+
+          sum_cantidad_frontera_beige2 = sum_cantidad_frontera_beige2 + item[j].Cantidad;
+          sum_facturado_beige2 = sum_facturado_beige2 + item[j].CantidadFacturado;
+
+
+          total_ImporteLiquidado_json2 = total_ImporteLiquidado_json2 + item[j].ImporteLiquidado;
+          total_ImporteFacturado_json2 = total_ImporteFacturado_json2 + item[j].ImporteFacturado;
+        }
+        total_precio_facturado_json2 = total_ImporteFacturado_json2/sum_cantidad_frontera_beige2;
+        total_precio_liquidado_json2 =total_ImporteLiquidado_json2 / sum_cantidad_frontera_beige2;
+
+
+        html+="<tr id='border' class='parent green-light'>";          
         if(idioma == "en"){
-          html+="<td>Sold Date: "+item[0].FechaVenta+"</td>";
+          html+="<td>Sold Date: "+item[ 0].FechaVenta+"</td>";
         }if(idioma == "es"){
           html+="<td>Fecha de Venta: "+item[0].FechaVenta+"</td>";
+
         }
         html+="<td></td>";
         html+="<td ></td>";
@@ -447,68 +521,103 @@ function tabla(ventas){
         html+="<td ></td>";
         html+="<td ></td>";
         html+="</tr>";
-        for (var j = 0; j < item.length; j++) {
-
-          final_amount = final_amount + item[j].ImporteLiquidado;
-          sum_invoiced_frontera = sum_invoiced_frontera + item[j].ImporteFacturado;
-
-          sum_cantidad_frontera_beige = sum_cantidad_frontera_beige + item[j].Cantidad;
-          sum_facturado_beige = sum_facturado_beige + item[j].CantidadFacturado;
-
-          sum_precio_facturado_beige = item[j].ImporteFacturado / item[j].Cantidad;
-          sum_precio_liquidado_beige = item[j].ImporteLiquidado / item[j].Cantidad;
-        }
-        
-        
-        html+="<tr class=''>";
-        /*html+="<td class='white'></td>";
-        html+="<td class='white'></td>";*/
-        html+="<td>"+item[0].Producto;+"</td>";
-        html+="<td></td>";
-        html+="<td>"+item[0].FolioVenta;+"</td>";
-        html+="<td></td>";
-        html+="<td>"+numberWithCommas(sum_cantidad_frontera_beige);+"</td>";
-        html+="<td>"+numberWithCommas(sum_precio_facturado_beige);+"</td>";
-        
-        html+="<td>"+numberWithCommas(sum_precio_liquidado_beige,2);+"</td>";
-        html+="<td>"+numberWithCommas(final_amount,2);+"</td>";
-        html+="</tr>"; 
 
 
-        for (var j = 0; j < item.length; j++) {
+        var json_producto = _.groupBy(item, function(d) {
+          return d.Producto + "-" + d.FolioVenta;
+        })
+        //var json_producto = _.groupBy(item, 'FolioVenta');
+        $.each(json_producto, function(i,item) {
+          sum_cantidad_frontera_beige=0;
+          sum_precio_facturado_beige=0;
+          sum_precio_liquidado_beige=0;
+          sum_facturado_beige=0;
+          sum_invoiced_frontera=0;
+          final_amount=0;
 
-          final_price = final_price + item[j].PrecioLiquidado;
-          final_amount = final_amount + item[j].ImporteLiquidado;
+          for (var j = 0; j < item.length; j++) {
+            final_amount = final_amount + item[j].ImporteLiquidado;
+            sum_invoiced_frontera = sum_invoiced_frontera + item[j].ImporteFacturado;
 
-          sum_invoiced_frontera = sum_invoiced_frontera + item[j].ImporteFacturado;
-          sum_cantidad_facturado_frontera = sum_cantidad_facturado_frontera + item[j].CantidadFacturado;
+            sum_cantidad_frontera_beige = sum_cantidad_frontera_beige + item[j].Cantidad;
+            sum_facturado_beige = sum_facturado_beige + item[j].CantidadFacturado;
 
-          precio_facturado = item[j].ImporteFacturado / item[j].Cantidad;
-          precio_liquidado = item[j].ImporteLiquidado / item[j].Cantidad;
+            sum_precio_facturado_beige = item[j].ImporteFacturado / item[j].Cantidad;
+            sum_precio_liquidado_beige = item[j].ImporteLiquidado / item[j].Cantidad;
+          }
 
-          sum_cantidad_frontera_beige = sum_cantidad_frontera_beige + item[j].Cantidad;
-          sum_sin_facturar_beige = sum_sin_facturar_beige + item[j].CantidadSinFacturar;
-          sum_facturado_beige = sum_facturado_beige + item[j].CantidadFacturado;
-
-          html+="<tr class='blue-light'>";
-          html+="<td class='white'></td>";
-          html+="<td class='white'></td>";
-          html+="<td>Carga: "+item[j].CodigoCarga;+"</td>";
+          html+="<tr class='parent'>";
+          html+="<td>"+item[0].Producto;+"</td>";
           html+="<td></td>";
-          html+="<td>"+item[j].Cantidad;+"</td>";
-          html+="<td>"+numberWithCommas(precio_facturado,2);+"</td>";
-          
-          html+="<td>"+numberWithCommas(precio_liquidado,2);+"</td>";
-          html+="<td>"+item[j].ImporteLiquidado;+"</td>";
+          html+="<td>"+item[0].FolioVenta;+"</td>";
+          html+="<td></td>";
+          html+="<td>"+numberWithCommas(sum_cantidad_frontera_beige);+"</td>";
+          html+="<td>"+numberWithCommas(sum_precio_facturado_beige,2);+"</td>";
+
+          html+="<td>"+numberWithCommas(sum_precio_liquidado_beige,2);+"</td>";
+          html+="<td>"+numberWithCommas(final_amount,2);+"</td>";
           html+="</tr>";
-        }
-        
+
+          for (var j = 0; j < item.length; j++) {
+
+            final_price = final_price + item[j].PrecioLiquidado;
+            final_amount = final_amount + item[j].ImporteLiquidado;
+
+            sum_invoiced_frontera = sum_invoiced_frontera + item[j].ImporteFacturado;
+            sum_cantidad_facturado_frontera = sum_cantidad_facturado_frontera + item[j].CantidadFacturado;
+
+            precio_facturado = item[j].ImporteFacturado / item[j].Cantidad;
+            precio_liquidado = item[j].ImporteLiquidado / item[j].Cantidad;
+
+            sum_cantidad_frontera_beige = sum_cantidad_frontera_beige + item[j].Cantidad;
+            sum_sin_facturar_beige = sum_sin_facturar_beige + item[j].CantidadSinFacturar;
+            sum_facturado_beige = sum_facturado_beige + item[j].CantidadFacturado;
+
+            html+="<tr class='blue-light'>";
+            html+="<td class='white'></td>";
+            html+="<td class='white'></td>";
+            html+="<td>Carga: "+item[j].CodigoCarga;+"</td>";
+            html+="<td></td>";
+            html+="<td>"+item[j].Cantidad;+"</td>";
+            html+="<td>"+numberWithCommas(precio_facturado,2);+"</td>";
+
+            html+="<td>"+numberWithCommas(precio_liquidado,2);+"</td>";
+            html+="<td>"+item[j].ImporteLiquidado;+"</td>";
+            html+="</tr>";
+            
+          }
+        })
+        html+="<tr class='parent beige'>";
+        html+="<td class='white'></td>";
+        html+="<td class='white'></td>";
+        html+="<td>Carga: "+item[0].FechaVenta;+"</td>";
+        html+="<td></td>";
+        html+="<td>"+numberWithCommas(sum_cantidad_frontera_beige2);+"</td>";
+        html+="<td>"+numberWithCommas(total_precio_facturado_json2,2);+"</td>";
+
+        html+="<td>"+numberWithCommas(total_precio_liquidado_json2,2);+"</td>";
+        html+="<td>"+numberWithCommas(final_amount2,2);+"</td>";
+        html+="</tr>";
       })
 
-      html+="</tbody>";
-      html+="</table>";
-      $("#tabla_loads").html(html);  
-    })
+html+="</tbody>";
+html+="</table>";
+$("#tabla_loads").html(html);  
+})
+$('table.table').each(function() {
+  var $table = $(this);
+  $table.find('.parent').click(function() {
+            $(this).nextUntil('.parent').toggle(); // must use jQuery 1.4 for nextUntil() method
+          });
+
+  var $childRows = $table.find('tbody tr').not('.parent').hide();
+  $table.find('button.hide').click(function() {
+    $childRows.hide();
+  });
+  $table.find('button.show').click(function() {
+    $childRows.show();
+  });
+});
 })
 }
 

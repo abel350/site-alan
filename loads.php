@@ -87,7 +87,8 @@ if(!isset($_SESSION['usuario']) and $_SESSION['estado'] != 'Autenticado') {
               <li><a id="commodity_eval" href ="#" data-toggle="tooltip" title="Soon" data-placement="right">Commodity Control</a></li>
               <li><a id="financial" href ="#" data-toggle="tooltip" title="Soon" data-placement="right">Financial Statments</a></li>
               <li><a id="news" href ="#" data-toggle="tooltip" title="Soon" data-placement="right">TripleH News</a></li>
-              <li><a id="about" href ="#" data-toggle="tooltip" title="Soon" data-placement="right">About site</a></li>   
+              <li><a id="about" href ="about-site.php">About site</a></li>  
+              <li><a id="about" href ="tutorial.php">Tutorial</a></li>    
 
             </ul>
             <ul class="nav navbar-nav navbar-right">

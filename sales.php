@@ -74,7 +74,7 @@ if(!isset($_SESSION['usuario']) and $_SESSION['estado'] != 'Autenticado') {
               <li><a id="inventory" href="index.php">Inventory</a></li>
               <li><a id="lloads" href ="loads.php">Loads</a></li>
               <li class=" active dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Sales <b class="caret"></b></a>
+                <a id="sales" href="#" class="dropdown-toggle" data-toggle="dropdown">Sales <b class="caret"></b></a>
                 <ul class="dropdown-menu">
                   <li><a href="sales.php">Price</a></li>
                   <li><a tabindex="-1" href="facturas-venta.php">Price by Load</a></li>
@@ -85,7 +85,8 @@ if(!isset($_SESSION['usuario']) and $_SESSION['estado'] != 'Autenticado') {
               <li><a id="commodity_eval" href ="#" data-toggle="tooltip" title="Soon" data-placement="right">Commodity Control</a></li>
               <li><a id="financial" href ="#" data-toggle="tooltip" title="Soon" data-placement="right">Financial Statments</a></li>
               <li><a id="news" href ="#" data-toggle="tooltip" title="Soon" data-placement="right">TripleH News</a></li>
-              <li><a id="about" href ="#" data-toggle="tooltip" title="Soon" data-placement="right">About site</a></li>   
+              <li><a id="about" href ="about-site.php">About site</a></li>  
+              <li><a id="about" href ="tutorial.php">Tutorial</a></li> 
 
             </ul>
             <ul class="nav navbar-nav navbar-right">

@@ -278,15 +278,15 @@ function imgerror() {
     if(idioma == "en"){
       $("#carousel_images").html("<div class='item active'><h2>No pictures available</h2></img></div>");
       $("a.carousel-control").css("display","none");
-      $("#status_load a.boton").css("pointer-events","none");
-      $("#status_load a.boton").css("color","#565050");
-      $("#status_load a.boton").html("No evaluation file");
+      /*$("#status_load a.boton").css("pointer-events","none");
+      $("#status_load a.boton").css("color","#565050");*/
+      /*$("#status_load a.boton").html("No evaluation file");*/
     }else if(idioma == "es"){
       $("#carousel_images").html("<div class='item active'><h2>Fotos no disponibles</h2></img></div>");
       $("a.carousel-control").css("display","none");
-      $("#status_load a.boton").css("pointer-events","none");
+      /*$("#status_load a.boton").css("pointer-events","none");
       $("#status_load a.boton").css("color","#565050");
-      $("#status_load a.boton").html("Evaluación de calidad no disponible");
+      $("#status_load a.boton").html("Evaluación de calidad no disponible");*/
     }
   })
 
@@ -297,17 +297,37 @@ function tabla_tamano(data, cultivos){
   obtener_idioma(function(idioma){
     console.log(data);
 
+    /*$.ajax({
+      url: 'recursos/listar_directorio.php',
+      type: 'POST',
+      data: {param1: cultivos},
+    })
+    .done(function(e) {
+      console.log(e);
+
+    });*/
+    
+
     var res2 = _.groupBy(data[cultivos], 'Cultivo');
+    var codigo=""; 
+    $.each(res2, function(i, item) {
+      for (var j = 0; j < item.length; j++) {
+        codigo = item[j].CodigoAgricultor;
+      }
+    })
+    console.log(codigo);
+
     console.log(res2);
     var html="";
     var boxes = 0;
     var images = "";
     var fecha="";
-    var enlace_evaluacion ="http://cargas.tripleh.com.mx/recepciones/"+cultivos+"/"+cultivos+".pdf";
+
+    var enlace_evaluacion ="http://cargas.tripleh.com.mx/recepciones/"+cultivos+"/"+codigo+"/"+cultivos+".pdf";
     $("a.carousel-control").css("display","block");
-    images+="<div class='item active'><img src='http://cargas.tripleh.com.mx/recepciones/"+cultivos+"/1.jpg' alt='1'  onerror='imgerror()'></img></div>";
+    images+="<div class='item active'><img src='http://cargas.tripleh.com.mx/recepciones/"+cultivos+"/"+codigo+"/1.jpg' alt='1'  onerror='imgerror()'></img></div>";
     for (var m = 2; m < 4; m++) { 
-      images+="<div class='item'><img src='http://cargas.tripleh.com.mx/recepciones/"+cultivos+"/"+m+".jpg' alt='"+m+"'></img></div>";
+      images+="<div class='item'><img src='http://cargas.tripleh.com.mx/recepciones/"+cultivos+"/"+codigo+"/"+m+".jpg' alt='"+m+"'></img></div>";
     }
 
     if(idioma == "en"){
@@ -335,17 +355,50 @@ function tabla_tamano(data, cultivos){
         html+="</div>";
       }
     })
-    if(idioma == "en"){
-      html+='<a target="new" href="'+enlace_evaluacion+'" class="boton" onerror="pdferror()">Quality Evaluation</a>';
-    }else if(idioma == "es"){
-      html+='<a target="new" href="'+enlace_evaluacion+'" class="boton" onerror="pdferror()">Evaluación de calidad</a>';
-    }
-    $("#carousel_images").html(images);
-    $("#status_load").html(html);
 
-    $("#status_load").on('click','a.boton', function() {
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        alert('ndnd');
+      }
+    };
+    xhttp.open("GET", enlace_evaluacion, true);
+    xhttp.send();
+
+
+    
+      /*success: function(response)
+      {
+        alert(response);
+        if(idioma == "en"){
+          html+='<a target="new" href="'+enlace_evaluacion+'" class="boton">Quality Evaluation</a>';
+        }else if(idioma == "es"){
+          html+='<a target="new" href="'+enlace_evaluacion+'" class="boton">Evaluación de calidad</a>';
+        }
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) 
+      {
+        alert(textStatus);
+        if(idioma == "en"){
+          html+='error';
+        }else if(idioma == "es"){
+          html+='error';
+        }
+      },*/
+
+      if(idioma == "en"){
+        html+='<a target="new" href="'+enlace_evaluacion+'" class="boton">Quality Evaluation</a>';
+      }else if(idioma == "es"){
+        html+='<a target="new" href="'+enlace_evaluacion+'" class="boton">Evaluación de calidad</a>';
+      }
+
+      $("#carousel_images").html(images);
+      $("#status_load").html(html);
+
+      $("#status_load").on('click','a.boton', function() {
+      })
     })
-  })
 }
 
 var numberWithCommas = function(x) {

@@ -5,6 +5,7 @@ if(!isset($_SESSION['usuario']) and $_SESSION['estado'] != 'Autenticado') {
   header('Location: index.php');
 } else {
   $nombre = $_SESSION['nombre_agricultor_sesion'];
+  $temporada = $_SESSION['temporada_text'];
   require('recursos/sesiones.php');
 };
 ?>
@@ -43,7 +44,8 @@ if(!isset($_SESSION['usuario']) and $_SESSION['estado'] != 'Autenticado') {
     <![endif]-->
 
     <!-- JQUERY -->
-    <script src="dist/js/jquery-3.2.1.min.js"></script>
+    <!-- <script src="dist/js/jquery-3.2.1.min.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <script src="dist/js/Chart.bundle.js"></script>
@@ -74,7 +76,7 @@ if(!isset($_SESSION['usuario']) and $_SESSION['estado'] != 'Autenticado') {
               <li><a id="inventory" href="index.php">Inventory</a></li>
               <li><a id="lloads" href ="loads.php">Loads</a></li>
               <li class="active dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Sales <b class="caret"></b></a>
+                <a id="sales" href="#" class="dropdown-toggle" data-toggle="dropdown">Sales <b class="caret"></b></a>
                 <ul class="dropdown-menu">
                   <li><a href="sales.php">Price</a></li>
                   <li><a tabindex="-1" href="facturas-venta.php">Price by Load</a></li>
@@ -85,7 +87,8 @@ if(!isset($_SESSION['usuario']) and $_SESSION['estado'] != 'Autenticado') {
               <li><a id="commodity_eval" href ="#" data-toggle="tooltip" title="Soon" data-placement="right">Commodity Control</a></li>
               <li><a id="financial" href ="#" data-toggle="tooltip" title="Soon" data-placement="right">Financial Statments</a></li>
               <li><a id="news" href ="#" data-toggle="tooltip" title="Soon" data-placement="right">TripleH News</a></li>
-              <li><a id="about" href ="#" data-toggle="tooltip" title="Soon" data-placement="right">About site</a></li>   
+              <li><a id="about" href ="about-site.php">About site</a></li>  
+              <li><a id="about" href ="tutorial.php">Tutorial</a></li> 
 
             </ul>
             <ul class="nav navbar-nav navbar-right">
@@ -102,6 +105,7 @@ if(!isset($_SESSION['usuario']) and $_SESSION['estado'] != 'Autenticado') {
       <div class="panel panel-primary">
         <div class="panel-heading">
           <!-- <h4>Mi tablero</h4> -->
+          <div id="filter-season"><i class="fa fa-filter">:</i> <b><?php echo $temporada; ?></b> </div>
           <div><span id="welcome">Welcome:</span> <b><?php echo $nombre; ?></b> </div>
           <a data-toggle="modal" href="#stack9" class=""><i class="fa fa-info-circle info" aria-hidden="true"></i></a>
         </div>

@@ -5,6 +5,18 @@ var v_etiqueta_sales=null;
 var v_codigos=null; 
 var v_commodity=null;
 
+if ($.cookie("no_thanks") == null) {
+	$('#mostrarmodal').appendTo("body");
+	function show_modal(){
+		$('#mostrarmodal').modal();
+	}
+	window.setTimeout(show_modal, 3000);
+}
+$(".nothanks").click(function() {
+	document.cookie = "no_thanks=true; expires=Fri, 31 Dec 9999 23:59:59 UTC";
+});
+
+
 fnCallbackAjax(function(agri){
 	data_server = agri;
 	myFunction();
@@ -13,6 +25,7 @@ fnCallbackAjax(function(agri){
 	var jj=0;
 	obtener_agricultores(function(agri){
 		obtener_idioma(function(idioma){
+			$("#filtro").html('');	
 			obtener_role(function(rol){
 				if (rol == "Administrador") {
 					var miJSON = JSON.parse(data_server);
@@ -20,7 +33,6 @@ fnCallbackAjax(function(agri){
 						if(idagricultor.indexOf(miJSON[i].CodigoAgricultor) < 0){	
 							idagricultor += miJSON[i].CodigoAgricultor +",";
 						}
-						
 					}
 					if(idioma =="en"){
 						$("#filtro").append('<option id="option2" value="'+idagricultor+'"> -- Select an option -- </option>');
@@ -33,7 +45,7 @@ fnCallbackAjax(function(agri){
 					$( "#filtro" ).change(function() {
 						$("select option:selected").val();
 					}).trigger( "change" );
-
+					
 					var codigos_embarques="";
 					var miJSON2 = agri;
 					for(var i in miJSON) {
@@ -106,6 +118,7 @@ fnCallbackAjax(function(agri){
 var data_server_filtro_agricultor=null;
 $("#filtro").change(function(){
 	$('#bodega').prop('selectedIndex',0);
+	$('#season').prop('selectedIndex',0);
 	$.blockUI({ 
 		message: '',
 		overlayCSS:  { 
@@ -138,7 +151,38 @@ $("#filtro").change(function(){
 			tabla(data_server_filtro_agricultor);
 		}
 
+		obtener_season(function(temporada){
+			var idagricultor=""
+			obtener_idioma(function(idioma){
+				$("#season").html('');	
+				var miJSON = JSON.parse(temporada);
+				for(var i in miJSON) {
+					if(idagricultor.indexOf(miJSON[i].CodigoTemporada) < 0){	
+						idagricultor += miJSON[i].CodigoTemporada +",";
+					}
+				}
+				if(idioma =="en"){
+					$("#season").append('<option id="option_s" value="'+idagricultor+'"> -- Select an option -- </option>');
+					$("#season").append('<option id="filter_season" value="'+idagricultor+'">No Filter</option>');
+				}else if(idioma =="es"){
+					$("#season").append('<option id="option_s" value="'+idagricultor+'"> -- Selecciona una opción -- </option>');
+					$("#season").append('<option id="filter_season" value="'+idagricultor+'">Sin Filtro</option>');
+				}
+				$( "#season" ).change(function() {
+					$("select option:selected").val();
+				}).trigger( "change" );
+				for(var i in miJSON) {                        
+					if ($('#season option:contains('+ miJSON[i].CodigoTemporada +')').length) {
+					}
+					else{
+						$("#season").append('<option value="'+miJSON[i].CodigoTemporada+'">'+miJSON[i].NombreTemporada+'</option>');
+					}
+				}  
+			})             
+		})
+
 		console.log("Agricultores cargado con éxito");
+
 		obtener_cultivos(function(cultivo){
 			obtener_idioma(function(idioma){
 				$("#cultivo").html('');
@@ -150,53 +194,47 @@ $("#filtro").change(function(){
 					$("#cultivo").append('<option id="option_c" value="todo"> -- Selecciona una opción -- </option>');
 					$("#cultivo").append('<option id="filter_cultivos" value="todo">Todo</option>');
 				}
-
-
 				var res2 = _.groupBy(data_server_filtro_agricultor, 'Cultivo')   
-				//$.each(res2, function(i, item) {
-					for(j in data_server_filtro_agricultor) {
+				for(j in data_server_filtro_agricultor) {
 
-						var sumtotal_cantidad  =0;
-						var sumtotal_importe = 0 ;
-						var avg_price = 0;
-						var sum_embarcado = 0;
-						var sum_recibido = 0;
-						var sum_disponible = 0;
-						var sum_ordenado = 0;
-						var sum_despachado = 0;
-						var sum_total_despachado = 0;
-						var sum_total_embarcado = 0;
-						var sum_total_recibido = 0;
-						var sum_total_ordenado = 0;
-						var sum_total_ordered = 0;
+					var sumtotal_cantidad  =0;
+					var sumtotal_importe = 0 ;
+					var avg_price = 0;
+					var sum_embarcado = 0;
+					var sum_recibido = 0;
+					var sum_disponible = 0;
+					var sum_ordenado = 0;
+					var sum_despachado = 0;
+					var sum_total_despachado = 0;
+					var sum_total_embarcado = 0;
+					var sum_total_recibido = 0;
+					var sum_total_ordenado = 0;
+					var sum_total_ordered = 0;
 
-						sum_total_ordered = sum_total_ordered + data_server_filtro_agricultor[j].OrdenadoAgricultor;
-						sum_total_embarcado = sum_total_embarcado + data_server_filtro_agricultor[j].Embarcado;
-						sum_total_despachado = sum_total_despachado + data_server_filtro_agricultor[j].Despachado; 
-						sum_total_ordenado = sum_total_ordenado + data_server_filtro_agricultor[j].Ordenado;
-						sum_total_recibido = sum_total_recibido + data_server_filtro_agricultor[j].Recibido;
-						sum_despachado = sum_despachado + data_server_filtro_agricultor[j].DespachadoHOY;
-						sum_recibido = sum_recibido + data_server_filtro_agricultor[j].RecibidoHOY;
-						sum_embarcado =sum_embarcado +(data_server_filtro_agricultor[j].Embarcado-data_server_filtro_agricultor[j].Recibido);
-						sum_ordenado = sum_ordenado + (data_server_filtro_agricultor[j].Ordenado-data_server_filtro_agricultor[j].Despachado);
+					sum_total_ordered = sum_total_ordered + data_server_filtro_agricultor[j].OrdenadoAgricultor;
+					sum_total_embarcado = sum_total_embarcado + data_server_filtro_agricultor[j].Embarcado;
+					sum_total_despachado = sum_total_despachado + data_server_filtro_agricultor[j].Despachado; 
+					sum_total_ordenado = sum_total_ordenado + data_server_filtro_agricultor[j].Ordenado;
+					sum_total_recibido = sum_total_recibido + data_server_filtro_agricultor[j].Recibido;
+					sum_despachado = sum_despachado + data_server_filtro_agricultor[j].DespachadoHOY;
+					sum_recibido = sum_recibido + data_server_filtro_agricultor[j].RecibidoHOY;
+					sum_embarcado =sum_embarcado +(data_server_filtro_agricultor[j].Embarcado-data_server_filtro_agricultor[j].Recibido);
+					sum_ordenado = sum_ordenado + (data_server_filtro_agricultor[j].Ordenado-data_server_filtro_agricultor[j].Despachado);
 
-						if(sum_embarcado > 0 || sum_recibido > 0 || sum_disponible > 0 || sum_total_ordered > 0 || sum_ordenado > 0 || data_server_filtro_agricultor[j].DespachadoHOY > 0 || sum_total_ordered > 0){
-							for(ii in miJSON) {
-								if (data_server_filtro_agricultor[j].Cultivo == miJSON[ii].NombreIngles) {
-									if ($('#cultivo option:contains('+ miJSON[ii].NombreIngles +')').length) {
-									}else{$("#cultivo").append('<option value="'+miJSON[ii].NombreIngles+'">'+miJSON[ii].NombreIngles+'</option>');}	
-								}
+					if(sum_embarcado > 0 || sum_recibido > 0 || sum_disponible > 0 || sum_total_ordered > 0 || sum_ordenado > 0 || data_server_filtro_agricultor[j].DespachadoHOY > 0 || sum_total_ordered > 0){
+						for(ii in miJSON) {
+							if (data_server_filtro_agricultor[j].Cultivo == miJSON[ii].NombreIngles) {
+								if ($('#cultivo option:contains('+ miJSON[ii].NombreIngles +')').length) {
+								}else{$("#cultivo").append('<option value="'+miJSON[ii].NombreIngles+'">'+miJSON[ii].NombreIngles+'</option>');}	
 							}
 						}
 					}
-
-			//})
-			$.unblockUI();
-			showPage();
-		})              
+				}
+				$.unblockUI();
+				showPage();
+			})              
 		})
-    //});
-})
+	})
 });
 
 
@@ -280,6 +318,17 @@ function obtener_role(callbackData) {
 	$.ajax({
 		type: 'GET',
 		url: 'recursos/role.php',
+		success:function(data){
+			callbackData(data);
+		},
+	}); 
+}
+
+//Petición para obtener TEMPORADAS
+function obtener_season(callbackData) {
+	$.ajax({
+		type: 'GET',
+		url: 'recursos/temporadas.php',
 		success:function(data){
 			callbackData(data);
 		},
@@ -938,6 +987,95 @@ $("#bodega").change(function(){
 	$.unblockUI();
 	showPage();
 })
+
+var  bodega = "todo";
+var  cultivo = "todo";
+var  filtro = "todo";
+
+
+$("#season").change(function(){
+	$.blockUI({ 
+		message: '',
+		overlayCSS:  { 
+			backgroundColor: '#fff', 
+			opacity:         0.6, 
+			cursor:          'wait' 
+		}, 
+	}); 
+	var temporada = $("#season option:selected").val();
+	var temporada_text = ($(this).find("option:selected").text());
+
+	$.ajax({
+		type: "POST",
+		url: "recursos/setTemporada.php",
+		data: { setTemporada : temporada, text : temporada_text} 
+	}).done(function(data){
+		var my_json = JSON.parse(data_server)
+		/*if (temporada == "none" && cultivo == "todo" && bodega == "todo" && cultivo == "todo" && filtro == "todo") {
+			datosgraph(data_server_filtro_agricultor);
+			tabla(data_server_filtro_agricultor);
+		}else*/
+		if (document.getElementById("season").selectedIndex == 0 || document.getElementById("season").selectedIndex == 1){
+			data_server_filtro_agricultor = JSON.parse(data_server);
+			datosgraph(data_server_filtro_agricultor);
+			tabla(data_server_filtro_agricultor);
+		}else{
+			data_server_filtro_agricultor = find_in_object(JSON.parse(data_server), {CodigoTemporada: temporada});
+			function find_in_object(my_object, my_criteria){
+				return my_object.filter(function(obj) {
+					return Object.keys(my_criteria).every(function(c) {
+						return obj[c] == my_criteria[c];
+					});
+				});
+			}
+			datosgraph(data_server_filtro_agricultor);
+			tabla(data_server_filtro_agricultor);
+		}/*
+		if (temporada != "none" && cultivo == "todo" && bodega == "todo" && cultivo == "todo" && filtro == "todo") {
+			var json= JSON.stringify(data_server_filtro_agricultor);
+			var filtered_json = find_in_object(JSON.parse(json), {CodigoTemporada: temporada});
+			function find_in_object(my_object, my_criteria){
+				return my_object.filter(function(obj) {
+					return Object.keys(my_criteria).every(function(c) {
+						return obj[c] == my_criteria[c];
+					});
+				});
+			}
+			datosgraph(filtered_json);
+			tabla(filtered_json);
+		}else
+		if (temporada == "none" && cultivo != "todo" && bodega != "todo" && cultivo != "todo" && filtro != "todo") {
+			var json= JSON.stringify(data_server_filtro_agricultor);
+			var filtered_json = find_in_object(JSON.parse(json), {CodigoTemporada: temporada});
+			function find_in_object(my_object, my_criteria){
+				return my_object.filter(function(obj) {
+					return Object.keys(my_criteria).every(function(c) {
+						return obj[c] == my_criteria[c];
+					});
+				});
+			}
+			datosgraph(filtered_json);
+			tabla(filtered_json);
+		}
+
+		else{
+			var json= JSON.stringify(data_server_filtro_agricultor);
+			var filtered_json = find_in_object(JSON.parse(json), {CodigoTemporada: temporada});
+			function find_in_object(my_object, my_criteria){
+				return my_object.filter(function(obj) {
+					return Object.keys(my_criteria).every(function(c) {
+						return obj[c] == my_criteria[c];
+					});
+				});
+			}
+			datosgraph(filtered_json);
+			tabla(filtered_json);
+		}*/
+		$.unblockUI();
+		showPage();
+	})
+})
+
 
 $("#cultivo").change(function(){
 	$.blockUI({ 
