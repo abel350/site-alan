@@ -34,6 +34,7 @@ $("#login").click(function(e){
 						idagricultor = idagricultor+miJSON.agricultores[i].codigoAgricultor +",";
 					}
 					var id = idagricultor;
+					
 					$.ajax({
 						type: "POST",
 						url: "recursos/setidagricultor.php",

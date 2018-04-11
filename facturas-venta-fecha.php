@@ -111,28 +111,35 @@ if(!isset($_SESSION['usuario']) and $_SESSION['estado'] != 'Autenticado') {
         </div>
         <div class="panel-body">
           <div class="row">
-            <div class="col-lg-3 col-md-6 col-sm-12">
+            <div class="col-md-offset-1 col-lg-2 col-md-12 col-sm-12">
               <div class="con-json">  
                <label id="lagricultor" for="filtro">Filter by grower</label> 
                <select id="filtro" class="form-control">                  
                </select>
              </div>  
            </div>
-           <div class="col-lg-3 col-md-6 col-sm-12">
+           <div class="col-lg-2 col-md-12 col-sm-12">
+            <div class="con-json">  
+              <label id="lseason" for="season">Filter by Season</label> 
+              <select id="season" class="form-control">                  
+              </select>
+            </div>                 
+          </div>  
+          <div class="col-lg-2 col-md-12 col-sm-12">
             <div class="con-json">
               <label id="lbodega" for="bodega">Filter by warehouse</label>    
               <select id="bodega" name="bodega" class="form-control">                  
               </select>
             </div>               
           </div> 
-          <div class="col-lg-3 col-md-6 col-sm-12">
-            <div class="con-json">
-              <label id="lbodega" for="cultivo">Filter by commodity</label>    
+          <div class="col-lg-2 col-md-12 col-sm-12">
+            <div class="con-json">    
+              <label id="lcommodity" for="cultivo">Filter by commodity</label>
               <select id="cultivo" name="cultivo" class="form-control">                  
               </select>
             </div>               
-          </div> 
-          <div class="col-lg-3 col-md-6 col-sm-12">
+          </div>
+          <div class="col-lg-2 col-md-12 col-sm-12">
             <div class="con-json">
               <label id="lcontract" for="contract">Filter by Contract</label>    
               <select id="contract" name="contract" class="form-control">                  

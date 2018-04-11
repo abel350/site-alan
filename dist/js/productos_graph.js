@@ -1,9 +1,10 @@
-var data_server;
+var data_server=null;
 var v_etiqueta=null;
 var v_sales=null;
 var v_etiqueta_sales=null; 
 var v_codigos=null; 
 var v_commodity=null;
+var codigos_embarques="";
 
 if ($.cookie("no_thanks") == null) {
 	$('#mostrarmodal').appendTo("body");
@@ -14,18 +15,32 @@ if ($.cookie("no_thanks") == null) {
 }
 $(".nothanks").click(function() {
 	document.cookie = "no_thanks=true; expires=Fri, 31 Dec 9999 23:59:59 UTC";
-});
+})
+
+obtener_agricultores(function(agri){
+	var idagricultor = "";
+	var miJSON = agri;
+	for(var i in miJSON.agricultores) { 
+		idagricultor = idagricultor+miJSON.agricultores[i].codigoAgricultor +",";
+	}
+	var id = idagricultor;
+
+	$.ajax({
+		type: "POST",
+		url: "recursos/setidagricultor.php",
+		data: { id_sub_agricultor : id} 
+	})
+	.done(function(data){
+	}); 
 
 
-fnCallbackAjax(function(agri){
-	data_server = agri;
-	myFunction();
-	var idagricultor="";
-	var ii=0;
-	var jj=0;
-	obtener_agricultores(function(agri){
-		obtener_idioma(function(idioma){
-			$("#filtro").html('');	
+	fnCallbackAjax(function(data){
+		data_server = data;
+		myFunction();
+		var idagricultor="";
+		var ii=0;
+		var jj=0;
+		obtener_idioma(function(idioma){			
 			obtener_role(function(rol){
 				if (rol == "Administrador") {
 					var miJSON = JSON.parse(data_server);
@@ -42,15 +57,18 @@ fnCallbackAjax(function(agri){
 						$("#filtro").append('<option id="filter_agricultor" value="'+idagricultor+'">Sin Filtro</option>');
 					}
 
-					$( "#filtro" ).change(function() {
+					$("#filtro").change(function() {
 						$("select option:selected").val();
-					}).trigger( "change" );
-					
-					var codigos_embarques="";
-					var miJSON2 = agri;
+					}).trigger("change");
+
+
 					for(var i in miJSON) {
-						var regex = new RegExp('\\b' + miJSON[i].CodigoAgricultor + '\\b');
+						/*var regex = new RegExp('\\b' + miJSON[i].CodigoAgricultor + '\\b');
 						if(codigos_embarques.search(regex) < 0){
+							$("#filtro").append('<option value="'+miJSON[i].CodigoAgricultor+'">'+miJSON[i].Nombre+'</option>');
+							codigos_embarques += miJSON[i].CodigoAgricultor +",";
+						}*/
+						if(codigos_embarques.indexOf(miJSON[i].CodigoAgricultor) < 0){
 							$("#filtro").append('<option value="'+miJSON[i].CodigoAgricultor+'">'+miJSON[i].Nombre+'</option>');
 							codigos_embarques += miJSON[i].CodigoAgricultor +",";
 						}						
@@ -71,7 +89,7 @@ fnCallbackAjax(function(agri){
 					$( "#filtro" ).change(function() {
 						$("select option:selected").val();
 					}).trigger( "change" );
-
+					
 
 					var result = JSON.parse(data_server);
 					var res2 = _.groupBy(result, 'CodigoAgricultor')
@@ -168,13 +186,24 @@ $("#filtro").change(function(){
 					$("#season").append('<option id="option_s" value="'+idagricultor+'"> -- Selecciona una opción -- </option>');
 					$("#season").append('<option id="filter_season" value="'+idagricultor+'">Sin Filtro</option>');
 				}
-				$( "#season" ).change(function() {
+				/*$("#season").change(function() {
 					$("select option:selected").val();
-				}).trigger( "change" );
-				for(var i in miJSON) {                        
+				}).trigger( "change" );*/
+
+				// var temporada = $("#season option:selected").val();
+				var temporada_text = ($(this).find("option:selected").text());
+				$.ajax({
+					type: "POST",
+					url: "recursos/setTemporada.php",
+					data: { setTemporada : idagricultor, text : temporada_text} 
+				}).done(function(data){
+					console.log(data);
+				})
+
+				for(var i in miJSON) {                      
 					if ($('#season option:contains('+ miJSON[i].CodigoTemporada +')').length) {
 					}
-					else{
+					else{					
 						$("#season").append('<option value="'+miJSON[i].CodigoTemporada+'">'+miJSON[i].NombreTemporada+'</option>');
 					}
 				}  
@@ -258,7 +287,6 @@ function fnCallbackAjax(callbackData) {
 		},
 	}); 
 }
-
 
 
 //Petición para obtener agricultores
@@ -926,6 +954,7 @@ function obtener_bodegas(callbackData) {
 
 var  bodega = "todo";
 var  cultivo = "todo";
+var  season = "todo";
 
 $("#bodega").change(function(){
 	$.blockUI({ 
@@ -939,12 +968,14 @@ $("#bodega").change(function(){
 
 	bodega = $("#bodega option:selected").val();
 	cultivo = $("#cultivo option:selected").val();
+	season = $("#season option:selected").val();
+
 	var my_json = JSON.parse(data_server)
-	if (bodega == "todo" && cultivo == "todo") {
+	if (bodega == "todo" && cultivo == "todo" && document.getElementById("season").selectedIndex == 0 || document.getElementById("season").selectedIndex == 1 ) {
 		datosgraph(data_server_filtro_agricultor);
 		tabla(data_server_filtro_agricultor);
 	}else
-	if (bodega != "todo" && cultivo == "todo") {
+	if (bodega != "todo" && cultivo == "todo" && document.getElementById("season").selectedIndex == 0 || document.getElementById("season").selectedIndex == 1 ) {
 		var json= JSON.stringify(data_server_filtro_agricultor);
 		var filtered_json = find_in_object(JSON.parse(json), {NombreBodega: bodega});
 		function find_in_object(my_object, my_criteria){
@@ -957,7 +988,7 @@ $("#bodega").change(function(){
 		datosgraph(filtered_json);
 		tabla(filtered_json);
 	}else
-	if (bodega == "todo" && cultivo != "todo") {
+	if (bodega == "todo" && cultivo != "todo" && document.getElementById("season").selectedIndex == 0 || document.getElementById("season").selectedIndex == 1 ) {
 		var json= JSON.stringify(data_server_filtro_agricultor);
 		var filtered_json = find_in_object(JSON.parse(json), {Cultivo: cultivo});
 		function find_in_object(my_object, my_criteria){
@@ -970,23 +1001,77 @@ $("#bodega").change(function(){
 		datosgraph(filtered_json);
 		tabla(filtered_json);
 	}
-
-	else{
-		var json= JSON.stringify(data_server_filtro_agricultor);
-		var filtered_json = find_in_object(JSON.parse(json), {NombreBodega: bodega, Cultivo: cultivo});
-		function find_in_object(my_object, my_criteria){
-			return my_object.filter(function(obj) {
-				return Object.keys(my_criteria).every(function(c) {
-					return obj[c] == my_criteria[c];
+	else
+		if (bodega == "todo" && cultivo == "todo" && season != "todo") {
+			var json= JSON.stringify(data_server_filtro_agricultor);
+			var filtered_json = find_in_object(JSON.parse(json), {CodigoTemporada: season});
+			function find_in_object(my_object, my_criteria){
+				return my_object.filter(function(obj) {
+					return Object.keys(my_criteria).every(function(c) {
+						return obj[c] == my_criteria[c];
+					});
 				});
-			});
+			}
+			datosgraph(filtered_json);
+			tabla(filtered_json);
+		}else
+		if (bodega =! "todo" && cultivo != "todo" && document.getElementById("season").selectedIndex == 0 || document.getElementById("season").selectedIndex == 1 ) {
+			var json= JSON.stringify(data_server_filtro_agricultor);
+			var filtered_json = find_in_object(JSON.parse(json), {Cultivo: cultivo, NombreBodega: bodega});
+			function find_in_object(my_object, my_criteria){
+				return my_object.filter(function(obj) {
+					return Object.keys(my_criteria).every(function(c) {
+						return obj[c] == my_criteria[c];
+					});
+				});
+			}
+			datosgraph(filtered_json);
+			tabla(filtered_json);
 		}
-		datosgraph(filtered_json);
-		tabla(filtered_json);
-	}
-	$.unblockUI();
-	showPage();
-})
+		else
+			if (bodega == "todo" && cultivo != "todo" && season != "todo") {
+				var json= JSON.stringify(data_server_filtro_agricultor);
+				var filtered_json = find_in_object(JSON.parse(json), {Cultivo: cultivo, CodigoTemporada: season});
+				function find_in_object(my_object, my_criteria){
+					return my_object.filter(function(obj) {
+						return Object.keys(my_criteria).every(function(c) {
+							return obj[c] == my_criteria[c];
+						});
+					});
+				}
+				datosgraph(filtered_json);
+				tabla(filtered_json);
+			}
+			else
+				if (bodega != "todo" && cultivo == "todo" && season != "todo") {
+					var json= JSON.stringify(data_server_filtro_agricultor);
+					var filtered_json = find_in_object(JSON.parse(json), {NombreBodega: bodega, CodigoTemporada: season});
+					function find_in_object(my_object, my_criteria){
+						return my_object.filter(function(obj) {
+							return Object.keys(my_criteria).every(function(c) {
+								return obj[c] == my_criteria[c];
+							});
+						});
+					}
+					datosgraph(filtered_json);
+					tabla(filtered_json);
+				}
+				else{
+					var json= JSON.stringify(data_server_filtro_agricultor);
+					var filtered_json = find_in_object(JSON.parse(json), {NombreBodega: bodega, Cultivo: cultivo, CodigoTemporada: season});
+					function find_in_object(my_object, my_criteria){
+						return my_object.filter(function(obj) {
+							return Object.keys(my_criteria).every(function(c) {
+								return obj[c] == my_criteria[c];
+							});
+						});
+					}
+					datosgraph(filtered_json);
+					tabla(filtered_json);
+				}
+				$.unblockUI();
+				showPage();
+			})
 
 var  bodega = "todo";
 var  cultivo = "todo";
@@ -1005,33 +1090,20 @@ $("#season").change(function(){
 	var temporada = $("#season option:selected").val();
 	var temporada_text = ($(this).find("option:selected").text());
 
+	cultivo = $("#cultivo option:selected").val();
+	bodega = $("#bodega option:selected").val();
+
 	$.ajax({
 		type: "POST",
 		url: "recursos/setTemporada.php",
 		data: { setTemporada : temporada, text : temporada_text} 
 	}).done(function(data){
 		var my_json = JSON.parse(data_server)
-		/*if (temporada == "none" && cultivo == "todo" && bodega == "todo" && cultivo == "todo" && filtro == "todo") {
+		if (cultivo == "todo" && bodega == "todo"  && document.getElementById("season").selectedIndex == 0 || document.getElementById("season").selectedIndex == 1) {
 			datosgraph(data_server_filtro_agricultor);
 			tabla(data_server_filtro_agricultor);
-		}else*/
-		if (document.getElementById("season").selectedIndex == 0 || document.getElementById("season").selectedIndex == 1){
-			data_server_filtro_agricultor = JSON.parse(data_server);
-			datosgraph(data_server_filtro_agricultor);
-			tabla(data_server_filtro_agricultor);
-		}else{
-			data_server_filtro_agricultor = find_in_object(JSON.parse(data_server), {CodigoTemporada: temporada});
-			function find_in_object(my_object, my_criteria){
-				return my_object.filter(function(obj) {
-					return Object.keys(my_criteria).every(function(c) {
-						return obj[c] == my_criteria[c];
-					});
-				});
-			}
-			datosgraph(data_server_filtro_agricultor);
-			tabla(data_server_filtro_agricultor);
-		}/*
-		if (temporada != "none" && cultivo == "todo" && bodega == "todo" && cultivo == "todo" && filtro == "todo") {
+		}else
+		/*if (temporada.length < 3 && cultivo == "todo" && bodega == "todo") {
 			var json= JSON.stringify(data_server_filtro_agricultor);
 			var filtered_json = find_in_object(JSON.parse(json), {CodigoTemporada: temporada});
 			function find_in_object(my_object, my_criteria){
@@ -1044,9 +1116,23 @@ $("#season").change(function(){
 			datosgraph(filtered_json);
 			tabla(filtered_json);
 		}else
-		if (temporada == "none" && cultivo != "todo" && bodega != "todo" && cultivo != "todo" && filtro != "todo") {
+		if (temporada.length < 3 && cultivo != "todo" && bodega == "todo") {
 			var json= JSON.stringify(data_server_filtro_agricultor);
-			var filtered_json = find_in_object(JSON.parse(json), {CodigoTemporada: temporada});
+			var filtered_json = find_in_object(JSON.parse(json), {CodigoTemporada: temporada, Cultivo: cultivo});
+			function find_in_object(my_object, my_criteria){
+				return my_object.filter(function(obj) {
+					return Object.keys(my_criteria).every(function(c) {
+						return obj[c] == my_criteria[c];
+					});
+				});
+			}
+			datosgraph(filtered_json);
+			tabla(filtered_json);
+		}
+		else
+		if (temporada.length < 3 && cultivo != "todo" && bodega != "todo") {
+			var json= JSON.stringify(data_server_filtro_agricultor);
+			var filtered_json = find_in_object(JSON.parse(json), {CodigoTemporada: temporada, Cultivo: cultivo, NombreBodega: bodega});
 			function find_in_object(my_object, my_criteria){
 				return my_object.filter(function(obj) {
 					return Object.keys(my_criteria).every(function(c) {
@@ -1071,9 +1157,120 @@ $("#season").change(function(){
 			datosgraph(filtered_json);
 			tabla(filtered_json);
 		}*/
-		$.unblockUI();
-		showPage();
-	})
+		if (temporada.length < 3 && cultivo == "todo" && bodega == "todo") {
+			var json= JSON.stringify(data_server_filtro_agricultor);
+			var filtered_json = find_in_object(JSON.parse(json), {CodigoTemporada: temporada});
+			function find_in_object(my_object, my_criteria){
+				return my_object.filter(function(obj) {
+					return Object.keys(my_criteria).every(function(c) {
+						return obj[c] == my_criteria[c];
+					});
+				});
+			}
+			datosgraph(filtered_json);
+			tabla(filtered_json);
+		}else
+		if (bodega == "todo" && cultivo == "todo" && document.getElementById("season").selectedIndex == 0 || document.getElementById("season").selectedIndex == 1 ) {
+			datosgraph(data_server_filtro_agricultor);
+			tabla(data_server_filtro_agricultor);
+		}else
+		if (bodega != "todo" && cultivo == "todo" && document.getElementById("season").selectedIndex == 0 || document.getElementById("season").selectedIndex == 1 ) {
+			var json= JSON.stringify(data_server_filtro_agricultor);
+			var filtered_json = find_in_object(JSON.parse(json), {NombreBodega: bodega});
+			function find_in_object(my_object, my_criteria){
+				return my_object.filter(function(obj) {
+					return Object.keys(my_criteria).every(function(c) {
+						return obj[c] == my_criteria[c];
+					});
+				});
+			}
+			datosgraph(filtered_json);
+			tabla(filtered_json);
+		}else
+		if (bodega == "todo" && cultivo != "todo" && document.getElementById("season").selectedIndex == 0 || document.getElementById("season").selectedIndex == 1 ) {
+			var json= JSON.stringify(data_server_filtro_agricultor);
+			var filtered_json = find_in_object(JSON.parse(json), {Cultivo: cultivo});
+			function find_in_object(my_object, my_criteria){
+				return my_object.filter(function(obj) {
+					return Object.keys(my_criteria).every(function(c) {
+						return obj[c] == my_criteria[c];
+					});
+				});
+			}
+			datosgraph(filtered_json);
+			tabla(filtered_json);
+		}
+		else
+			if (bodega == "todo" && cultivo == "todo" && season != "todo") {
+				var json= JSON.stringify(data_server_filtro_agricultor);
+				var filtered_json = find_in_object(JSON.parse(json), {CodigoTemporada: season});
+				function find_in_object(my_object, my_criteria){
+					return my_object.filter(function(obj) {
+						return Object.keys(my_criteria).every(function(c) {
+							return obj[c] == my_criteria[c];
+						});
+					});
+				}
+				datosgraph(filtered_json);
+				tabla(filtered_json);
+			}else
+			if (bodega =! "todo" && cultivo != "todo" && document.getElementById("season").selectedIndex == 0 || document.getElementById("season").selectedIndex == 1 ) {
+				var json= JSON.stringify(data_server_filtro_agricultor);
+				var filtered_json = find_in_object(JSON.parse(json), {Cultivo: cultivo, NombreBodega: bodega});
+				function find_in_object(my_object, my_criteria){
+					return my_object.filter(function(obj) {
+						return Object.keys(my_criteria).every(function(c) {
+							return obj[c] == my_criteria[c];
+						});
+					});
+				}
+				datosgraph(filtered_json);
+				tabla(filtered_json);
+			}
+			else
+				if (bodega == "todo" && cultivo != "todo" && season != "todo") {
+					var json= JSON.stringify(data_server_filtro_agricultor);
+					var filtered_json = find_in_object(JSON.parse(json), {Cultivo: cultivo, CodigoTemporada: season});
+					function find_in_object(my_object, my_criteria){
+						return my_object.filter(function(obj) {
+							return Object.keys(my_criteria).every(function(c) {
+								return obj[c] == my_criteria[c];
+							});
+						});
+					}
+					datosgraph(filtered_json);
+					tabla(filtered_json);
+				}
+				else
+					if (bodega != "todo" && cultivo == "todo" && season != "todo") {
+						var json= JSON.stringify(data_server_filtro_agricultor);
+						var filtered_json = find_in_object(JSON.parse(json), {NombreBodega: bodega, CodigoTemporada: season});
+						function find_in_object(my_object, my_criteria){
+							return my_object.filter(function(obj) {
+								return Object.keys(my_criteria).every(function(c) {
+									return obj[c] == my_criteria[c];
+								});
+							});
+						}
+						datosgraph(filtered_json);
+						tabla(filtered_json);
+					}
+					else{
+						var json= JSON.stringify(data_server_filtro_agricultor);
+						var filtered_json = find_in_object(JSON.parse(json), {NombreBodega: bodega, Cultivo: cultivo, CodigoTemporada: season});
+						function find_in_object(my_object, my_criteria){
+							return my_object.filter(function(obj) {
+								return Object.keys(my_criteria).every(function(c) {
+									return obj[c] == my_criteria[c];
+								});
+							});
+						}
+						datosgraph(filtered_json);
+						tabla(filtered_json);
+					}
+					$.unblockUI();
+					showPage();
+				})
 })
 
 
@@ -1086,15 +1283,30 @@ $("#cultivo").change(function(){
 			cursor:          'wait' 
 		}, 
 	}); 
+	
 	bodega = $("#bodega option:selected").val();
 	cultivo = $("#cultivo option:selected").val();
+	season = $("#season option:selected").val();
 
 	var my_json = JSON.parse(data_server)
-	if (bodega == "todo" && cultivo == "todo") {
+	if (bodega == "todo" && cultivo == "todo" && document.getElementById("season").selectedIndex == 0 || document.getElementById("season").selectedIndex == 1 ) {
 		datosgraph(data_server_filtro_agricultor);
 		tabla(data_server_filtro_agricultor);
 	}else
-	if (bodega == "todo" && cultivo != "todo") {
+	if (bodega != "todo" && cultivo == "todo" && document.getElementById("season").selectedIndex == 0 || document.getElementById("season").selectedIndex == 1 ) {
+		var json= JSON.stringify(data_server_filtro_agricultor);
+		var filtered_json = find_in_object(JSON.parse(json), {NombreBodega: bodega});
+		function find_in_object(my_object, my_criteria){
+			return my_object.filter(function(obj) {
+				return Object.keys(my_criteria).every(function(c) {
+					return obj[c] == my_criteria[c];
+				});
+			});
+		}
+		datosgraph(filtered_json);
+		tabla(filtered_json);
+	}else
+	if (bodega == "todo" && cultivo != "todo" && document.getElementById("season").selectedIndex == 0 || document.getElementById("season").selectedIndex == 1 ) {
 		var json= JSON.stringify(data_server_filtro_agricultor);
 		var filtered_json = find_in_object(JSON.parse(json), {Cultivo: cultivo});
 		function find_in_object(my_object, my_criteria){
@@ -1106,35 +1318,78 @@ $("#cultivo").change(function(){
 		}
 		datosgraph(filtered_json);
 		tabla(filtered_json);
-	}else if (bodega != "todo" && cultivo == "todo") {
-		var json= JSON.stringify(data_server_filtro_agricultor);
-		var filtered_json = find_in_object(JSON.parse(json), {NombreBodega:bodega});
-		function find_in_object(my_object, my_criteria){
-			return my_object.filter(function(obj) {
-				return Object.keys(my_criteria).every(function(c) {
-					return obj[c] == my_criteria[c];
-				});
-			});
-		}
-		datosgraph(filtered_json);
-		tabla(filtered_json);
 	}
-	else{
-		var json= JSON.stringify(data_server_filtro_agricultor);
-		var filtered_json = find_in_object(JSON.parse(json), {NombreBodega: bodega, Cultivo: cultivo});
-		function find_in_object(my_object, my_criteria){
-			return my_object.filter(function(obj) {
-				return Object.keys(my_criteria).every(function(c) {
-					return obj[c] == my_criteria[c];
+	else
+		if (bodega == "todo" && cultivo == "todo" && season != "todo") {
+			var json= JSON.stringify(data_server_filtro_agricultor);
+			var filtered_json = find_in_object(JSON.parse(json), {CodigoTemporada: season});
+			function find_in_object(my_object, my_criteria){
+				return my_object.filter(function(obj) {
+					return Object.keys(my_criteria).every(function(c) {
+						return obj[c] == my_criteria[c];
+					});
 				});
-			});
+			}
+			datosgraph(filtered_json);
+			tabla(filtered_json);
+		}else
+		if (bodega =! "todo" && cultivo != "todo" && document.getElementById("season").selectedIndex == 0 || document.getElementById("season").selectedIndex == 1 ) {
+			var json= JSON.stringify(data_server_filtro_agricultor);
+			var filtered_json = find_in_object(JSON.parse(json), {Cultivo: cultivo, NombreBodega: bodega});
+			function find_in_object(my_object, my_criteria){
+				return my_object.filter(function(obj) {
+					return Object.keys(my_criteria).every(function(c) {
+						return obj[c] == my_criteria[c];
+					});
+				});
+			}
+			datosgraph(filtered_json);
+			tabla(filtered_json);
 		}
-		datosgraph(filtered_json);
-		tabla(filtered_json);
-	}
-	$.unblockUI();
-	showPage();
-})
+		else
+			if (bodega == "todo" && cultivo != "todo" && season != "todo") {
+				var json= JSON.stringify(data_server_filtro_agricultor);
+				var filtered_json = find_in_object(JSON.parse(json), {Cultivo: cultivo, CodigoTemporada: season});
+				function find_in_object(my_object, my_criteria){
+					return my_object.filter(function(obj) {
+						return Object.keys(my_criteria).every(function(c) {
+							return obj[c] == my_criteria[c];
+						});
+					});
+				}
+				datosgraph(filtered_json);
+				tabla(filtered_json);
+			}
+			else
+				if (bodega != "todo" && cultivo == "todo" && season != "todo") {
+					var json= JSON.stringify(data_server_filtro_agricultor);
+					var filtered_json = find_in_object(JSON.parse(json), {NombreBodega: bodega, CodigoTemporada: season});
+					function find_in_object(my_object, my_criteria){
+						return my_object.filter(function(obj) {
+							return Object.keys(my_criteria).every(function(c) {
+								return obj[c] == my_criteria[c];
+							});
+						});
+					}
+					datosgraph(filtered_json);
+					tabla(filtered_json);
+				}
+				else{
+					var json= JSON.stringify(data_server_filtro_agricultor);
+					var filtered_json = find_in_object(JSON.parse(json), {NombreBodega: bodega, Cultivo: cultivo, CodigoTemporada: season});
+					function find_in_object(my_object, my_criteria){
+						return my_object.filter(function(obj) {
+							return Object.keys(my_criteria).every(function(c) {
+								return obj[c] == my_criteria[c];
+							});
+						});
+					}
+					datosgraph(filtered_json);
+					tabla(filtered_json);
+				}
+				$.unblockUI();
+				showPage();
+			})
 
 var numberWithCommas = function(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");

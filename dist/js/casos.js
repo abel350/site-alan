@@ -1,34 +1,47 @@
 var data_server;
-fnCallbackAjax(function(agri){
-  data_server = agri;
-  myFunction();
-  obtener_bodegas(function(cultivo){
-    obtener_idioma(function(idioma){
-      var miJSON = cultivo;
-      if(idioma =="en"){
-        $("#bodega").append('<option id="option_b" value="todo"> -- Select an option -- </option>');
-        $("#bodega").append('<option id="filter_bogeda" value="todo">No Filter</option>');
-        $("[data-toggle='tooltip']").attr('data-original-title', 'Soon').tooltip('hide');
-        $("#english").css( "border-bottom", "solid 3px #5bc0de" );
-        $("#english").css( "border-top", "solid 3px #5bc0de" );
-      }else if(idioma =="es"){
-        $("#bodega").append('<option id="option_b" value="todo"> -- Selecciona una opción -- </option>');
-        $("#bodega").append('<option id="filter_bogeda" value="todo">Sin Filtro</option>');
-        $("[data-toggle='tooltip']").attr('data-original-title', 'Pronto').tooltip('hide');
-        $("#spanish").css( "border-bottom", "solid 3px #5bc0de" );
-        $("#spanish").css( "border-top", "solid 3px #5bc0de" );
-      }
+obtener_agricultores(function(agri){
+  var idagricultor = "";
+  var miJSON = agri;
+  for(var i in miJSON.agricultores) { 
+    idagricultor = idagricultor+miJSON.agricultores[i].codigoAgricultor +",";
+  }
+  var id = idagricultor;
+  $.ajax({
+    type: "POST",
+    url: "recursos/setidagricultor.php",
+    data: { id_sub_agricultor : id} 
+  })
+  .done(function(data){
+  });
+  fnCallbackAjax(function(agri){
+    data_server = agri;
+    myFunction();
+    obtener_bodegas(function(cultivo){
+      obtener_idioma(function(idioma){
+        var miJSON = cultivo;
+        if(idioma =="en"){
+          $("#bodega").append('<option id="option_b" value="todo"> -- Select an option -- </option>');
+          $("#bodega").append('<option id="filter_bogeda" value="todo">No Filter</option>');
+          $("[data-toggle='tooltip']").attr('data-original-title', 'Soon').tooltip('hide');
+          $("#english").css( "border-bottom", "solid 3px #5bc0de" );
+          $("#english").css( "border-top", "solid 3px #5bc0de" );
+        }else if(idioma =="es"){
+          $("#bodega").append('<option id="option_b" value="todo"> -- Selecciona una opción -- </option>');
+          $("#bodega").append('<option id="filter_bogeda" value="todo">Sin Filtro</option>');
+          $("[data-toggle='tooltip']").attr('data-original-title', 'Pronto').tooltip('hide');
+          $("#spanish").css( "border-bottom", "solid 3px #5bc0de" );
+          $("#spanish").css( "border-top", "solid 3px #5bc0de" );
+        }
 
-      for(var i in miJSON) {                        
-        $("#bodega").append('<option value="'+miJSON[i].codigo+'">'+miJSON[i].nombre+'</option>');
-      }   
-    })             
-  }) 
-  
-  var idagricultor="";
-  var ii=0;
-  var jj=0
-  obtener_agricultores(function(agri){
+        for(var i in miJSON) {                        
+          $("#bodega").append('<option value="'+miJSON[i].codigo+'">'+miJSON[i].nombre+'</option>');
+        }   
+      })             
+    }) 
+
+    var idagricultor="";
+    var ii=0;
+    var jj=0
     obtener_idioma(function(idioma){
       obtener_role(function(rol){
         if (rol == "Administrador") {
@@ -37,7 +50,7 @@ fnCallbackAjax(function(agri){
             if(idagricultor.indexOf(miJSON[i].CodigoAgricultor) < 0){ 
               idagricultor += miJSON[i].CodigoAgricultor +",";
             }
-            
+
           }
           if(idioma =="en"){
             $("#filtro").append('<option id="option2" value="'+idagricultor+'"> -- Select an option -- </option>');

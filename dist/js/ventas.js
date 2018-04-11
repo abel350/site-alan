@@ -1,43 +1,56 @@
 var data_ventas
 var data_server;
-obtener_ventas(function(ventas){
-  data_ventas = ventas;
-  fnCallbackAjax(function(agri){
-    data_server = agri;
-    myFunction();
-    obtener_bodegas(function(cultivo){
-      obtener_idioma(function(idioma){
-        var miJSON = cultivo;
-        if(idioma =="en"){
-          $("#bodega").append('<option id="option_b" value="todo"> -- Select an option -- </option>');
-          $("#bodega").append('<option id="filter_bogeda" value="todo">No Filter</option>');
-          $("[data-toggle='tooltip']").attr('data-original-title', 'Soon').tooltip('hide');
-          $("#english").css( "border-bottom", "solid 3px #5bc0de" );
-          $("#english").css( "border-top", "solid 3px #5bc0de" );
-        }else if(idioma =="es"){
-          $("#bodega").append('<option id="option_b" value="todo"> -- Selecciona una opción -- </option>');
-          $("#bodega").append('<option id="filter_bogeda" value="todo">Sin Filtro</option>');
-          $("[data-toggle='tooltip']").attr('data-original-title', 'Pronto').tooltip('hide');
-          $("#spanish").css( "border-bottom", "solid 3px #5bc0de" );
-          $("#spanish").css( "border-top", "solid 3px #5bc0de" );
-        }
+obtener_agricultores(function(agri){
+  var idagricultor = "";
+  var miJSON = agri;
+  for(var i in miJSON.agricultores) { 
+    idagricultor = idagricultor+miJSON.agricultores[i].codigoAgricultor +",";
+  }
+  var id = idagricultor;
+  $.ajax({
+    type: "POST",
+    url: "recursos/setidagricultor.php",
+    data: { id_sub_agricultor : id} 
+  })
+  .done(function(data){
+  });
+  obtener_ventas(function(ventas){
+    data_ventas = ventas;
+    fnCallbackAjax(function(agri){
+      data_server = agri;
+      myFunction();
+      obtener_bodegas(function(cultivo){
+        obtener_idioma(function(idioma){
+          var miJSON = cultivo;
+          if(idioma =="en"){
+            $("#bodega").append('<option id="option_b" value="todo"> -- Select an option -- </option>');
+            $("#bodega").append('<option id="filter_bogeda" value="todo">No Filter</option>');
+            $("[data-toggle='tooltip']").attr('data-original-title', 'Soon').tooltip('hide');
+            $("#english").css( "border-bottom", "solid 3px #5bc0de" );
+            $("#english").css( "border-top", "solid 3px #5bc0de" );
+          }else if(idioma =="es"){
+            $("#bodega").append('<option id="option_b" value="todo"> -- Selecciona una opción -- </option>');
+            $("#bodega").append('<option id="filter_bogeda" value="todo">Sin Filtro</option>');
+            $("[data-toggle='tooltip']").attr('data-original-title', 'Pronto').tooltip('hide');
+            $("#spanish").css( "border-bottom", "solid 3px #5bc0de" );
+            $("#spanish").css( "border-top", "solid 3px #5bc0de" );
+          }
 
-        for(var i in miJSON) {                        
-          $("#bodega").append('<option value="'+miJSON[i].codigo+'">'+miJSON[i].nombre+'</option>');
-        }   
-      })             
-    }) 
+          for(var i in miJSON) {                        
+            $("#bodega").append('<option value="'+miJSON[i].codigo+'">'+miJSON[i].nombre+'</option>');
+          }   
+        })             
+      }) 
 
-    var idagricultor="";
-    var ii=0;
-    var jj=0
-    obtener_agricultores(function(agri){
+      var idagricultor="";
+      var ii=0;
+      var jj=0
       obtener_idioma(function(idioma){
-        var miJSON = agri;
+        /*var miJSON = agri;
         idagricultor += miJSON.codigoAgricultor +",";
         for(var i in miJSON.agricultores) { 
           idagricultor += miJSON.agricultores[i].codigoAgricultor +",";
-        }
+        }*/
         if(idioma =="en"){
           $("#filtro").append('<option id="option2" value="'+idagricultor+'"> -- Select an option -- </option>');
           $("#filtro").append('<option id="filter_agricultor" value="'+idagricultor+'">No Filter</option>');
@@ -274,7 +287,7 @@ function obtener_bodegas(callbackData) {
   }); 
 } 
 
-var  bodega = "todo";
+/*var  bodega = "todo";
 $("#bodega").change(function(){
   bodega = $("#bodega option:selected").val();
   var my_json = JSON.parse(data_ventas);
@@ -293,7 +306,68 @@ $("#bodega").change(function(){
     tabla(filtered_json);
   }
   
+})*/
+
+filtro = "todo";
+bodega = "todo";
+$("#bodega").change(function(){
+  $.blockUI({ 
+    message: '',
+    overlayCSS:  { 
+      backgroundColor: '#fff', 
+      opacity:         0.6, 
+      cursor:          'wait' 
+    }, 
+  }); 
+  console.log(data_server_filtro_agricultor);
+
+  bodega = $("#bodega option:selected").val();
+  filtro = $("#filtro option:selected").val();
+  var my_json = JSON.parse(data_server)
+  if (bodega == "todo" && document.getElementById("filtro").selectedIndex == 0 || document.getElementById("filtro").selectedIndex == 1) {
+    tabla(data_server_filtro_agricultor);
+  }else
+  if (bodega != "todo" && document.getElementById("filtro").selectedIndex == 0 || document.getElementById("filtro").selectedIndex == 1) {
+    var json= JSON.stringify(data_server_filtro_agricultor);
+    var filtered_json = find_in_object(JSON.parse(json), {NombreBodega: bodega});
+    function find_in_object(my_object, my_criteria){
+      return my_object.filter(function(obj) {
+        return Object.keys(my_criteria).every(function(c) {
+          return obj[c] == my_criteria[c];
+        });
+      });
+    }
+    tabla(filtered_json);
+  }else
+  if (bodega == "todo" && filtro != "todo") {
+    var json= JSON.stringify(data_server_filtro_agricultor);
+    var filtered_json = find_in_object(JSON.parse(json), {CodigoAgricultor: filtro});
+    function find_in_object(my_object, my_criteria){
+      return my_object.filter(function(obj) {
+        return Object.keys(my_criteria).every(function(c) {
+          return obj[c] == my_criteria[c];
+        });
+      });
+    }
+    tabla(filtered_json);
+  }
+
+  else{
+    var json= JSON.stringify(data_server_filtro_agricultor);
+    var filtered_json = find_in_object(JSON.parse(json), {NombreBodega: bodega, CodigoAgricultor: filtro});
+    function find_in_object(my_object, my_criteria){
+      return my_object.filter(function(obj) {
+        return Object.keys(my_criteria).every(function(c) {
+          return obj[c] == my_criteria[c];
+        });
+      });
+    }
+    tabla(filtered_json);
+  }
+  $.unblockUI();
+  showPage();
 })
+
 
 var myVar;
 function myFunction() {

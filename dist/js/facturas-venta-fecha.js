@@ -5,61 +5,70 @@ var temporadaok;
 obtener_temporada(function(season){
   temporadaok = season;
 })
-obtener_ventas(function(ventas){
-  if(temporadaok.length > 3){
-    data_ventas = ventas;
-  }else { 
-    data = find_in_object(JSON.parse(ventas), {CodigoTemporada: temporadaok});
-    function find_in_object(my_object, my_criteria){
-      return my_object.filter(function(obj) {
-        return Object.keys(my_criteria).every(function(c) {
-          return obj[c] == my_criteria[c];
-        });
-      });
-    }
-    data_ventas = JSON.stringify(data);
+obtener_agricultores(function(agri){
+  var idagricultor = "";
+  var miJSON = agri;
+  for(var i in miJSON.agricultores) { 
+    idagricultor = idagricultor+miJSON.agricultores[i].codigoAgricultor +",";
   }
-  fnCallbackAjax(function(agri){
-    data_server = agri;
-    myFunction();
-    obtener_bodegas(function(cultivo){
-      console.log(cultivo);
-      obtener_idioma(function(idioma){
-        var miJSON = cultivo;
-        if(idioma =="en"){
-          $("#bodega").append('<option id="option_b" value="todo"> -- Select an option -- </option>');
-          $("#bodega").append('<option id="filter_bogeda" value="todo">No Filter</option>');
-          $("[data-toggle='tooltip']").attr('data-original-title', 'Soon').tooltip('hide');
-          $("#english").css( "border-bottom", "solid 3px #5bc0de" );
-          $("#english").css( "border-top", "solid 3px #5bc0de" );
-        }else if(idioma =="es"){
-          $("#bodega").append('<option id="option_b" value="todo"> -- Selecciona una opción -- </option>');
-          $("#bodega").append('<option id="filter_bogeda" value="todo">Sin Filtro</option>');
-          $("[data-toggle='tooltip']").attr('data-original-title', 'Pronto').tooltip('hide');
-          $("#spanish").css( "border-bottom", "solid 3px #5bc0de" );
-          $("#spanish").css( "border-top", "solid 3px #5bc0de" );
-        }
+  var id = idagricultor;
+  $.ajax({
+    type: "POST",
+    url: "recursos/setidagricultor.php",
+    data: { id_sub_agricultor : id} 
+  })
+  .done(function(data){
+  });
 
-        for(var i in miJSON) {                        
-          $("#bodega").append('<option value="'+miJSON[i].codigo+'">'+miJSON[i].nombre+'</option>');
-        }   
-      })             
-    }) 
+  obtener_ventas(function(ventas){
+    if(temporadaok.length > 3){
+      data_ventas = ventas;
+    }else { 
+      data = find_in_object(JSON.parse(ventas), {CodigoTemporada: temporadaok});
+      function find_in_object(my_object, my_criteria){
+        return my_object.filter(function(obj) {
+          return Object.keys(my_criteria).every(function(c) {
+            return obj[c] == my_criteria[c];
+          });
+        });
+      }
+      data_ventas = JSON.stringify(data);
+    }
+    fnCallbackAjax(function(agri){
+      data_server = agri;
+      myFunction();
+      obtener_bodegas(function(cultivo){
+        console.log(cultivo);
+        obtener_idioma(function(idioma){
+          var miJSON = cultivo;
+          if(idioma =="en"){
+            $("#bodega").append('<option id="option_b" value="todo"> -- Select an option -- </option>');
+            $("#bodega").append('<option id="filter_bogeda" value="todo">No Filter</option>');
+            $("[data-toggle='tooltip']").attr('data-original-title', 'Soon').tooltip('hide');
+            $("#english").css( "border-bottom", "solid 3px #5bc0de" );
+            $("#english").css( "border-top", "solid 3px #5bc0de" );
+          }else if(idioma =="es"){
+            $("#bodega").append('<option id="option_b" value="todo"> -- Selecciona una opción -- </option>');
+            $("#bodega").append('<option id="filter_bogeda" value="todo">Sin Filtro</option>');
+            $("[data-toggle='tooltip']").attr('data-original-title', 'Pronto').tooltip('hide');
+            $("#spanish").css( "border-bottom", "solid 3px #5bc0de" );
+            $("#spanish").css( "border-top", "solid 3px #5bc0de" );
+          }
 
-    var idagricultor="";
-    var ii=0;
-    var jj=0
-    obtener_agricultores(function(agri){
+          for(var i in miJSON) {                        
+            $("#bodega").append('<option value="'+miJSON[i].codigo+'">'+miJSON[i].nombre+'</option>');
+          }   
+        })             
+      }) 
+
+      var idagricultor="";
+      var ii=0;
+      var jj=0
       obtener_idioma(function(idioma){
         obtener_role(function(rol){
           if (rol == "Administrador") {
             var miJSON = JSON.parse(data_server);
-            for(var i in miJSON) {
-              if(idagricultor.indexOf(miJSON[i].CodigoAgricultor) < 0){ 
-                idagricultor += miJSON[i].CodigoAgricultor +",";
-              }
 
-            }
             if(idioma =="en"){
               $("#filtro").append('<option id="option2" value="'+idagricultor+'"> -- Select an option -- </option>');
               $("#filtro").append('<option id="filter_agricultor" value="'+idagricultor+'">No Filter</option>');
@@ -112,7 +121,7 @@ obtener_ventas(function(ventas){
         })       
       })
     })
-  });
+});
 });
 
 
@@ -148,6 +157,34 @@ $("#filtro").change(function(){
       }
       tabla(data_server_filtro_agricultor);
     }
+
+    obtener_season(function(temporada){
+      var idagricultor=""
+      obtener_idioma(function(idioma){
+        $("#season").html('');  
+        var miJSON = JSON.parse(temporada);
+        for(var i in miJSON) {
+          if(idagricultor.indexOf(miJSON[i].CodigoTemporada) < 0){  
+            idagricultor += miJSON[i].CodigoTemporada +",";
+          }
+        }
+        if(idioma =="en"){
+          $("#season").append('<option id="option_s" value="'+idagricultor+'"> -- Select an option -- </option>');
+          $("#season").append('<option id="filter_season" value="'+idagricultor+'">No Filter</option>');
+        }else if(idioma =="es"){
+          $("#season").append('<option id="option_s" value="'+idagricultor+'"> -- Selecciona una opción -- </option>');
+          $("#season").append('<option id="filter_season" value="'+idagricultor+'">Sin Filtro</option>');
+        }
+
+        for(var i in miJSON) {                      
+          if ($('#season option:contains('+ miJSON[i].CodigoTemporada +')').length) {
+          }
+          else{         
+            $("#season").append('<option value="'+miJSON[i].CodigoTemporada+'">'+miJSON[i].NombreTemporada+'</option>');
+          }
+        }  
+      })             
+    })
     obtener_cultivos(function(cultivo){
       obtener_idioma(function(idioma){
         $("#cultivo").html('');
@@ -193,6 +230,17 @@ $("#filtro").change(function(){
 
 
 //END DOCUMENT READY
+
+//Petición para obtener TEMPORADAS
+function obtener_season(callbackData) {
+  $.ajax({
+    type: 'GET',
+    url: 'recursos/temporadas.php',
+    success:function(data){
+      callbackData(data);
+    },
+  }); 
+}
 
 //Petición para obtener agricultores
 function obtener_agricultores(callbackData) {
@@ -324,7 +372,11 @@ function tabla(ventas){
     html+="<table border='1|1' class='table table-striped table-bordered display total-blue'>";
     html+="<thead>";
     html+="<tr>";
-    html+="<th class='white'></th>";
+    if(idioma == "en"){
+      html+="<th class='white'><button class='show btn btn-primary btn-block'>Expand all</button></th>";
+    }else if(idioma == "es"){
+      html+="<th class='white'><button class='show btn btn-primary btn-block'>Expandir</button></th>";
+    }
     html+="<th class='white'></th>";
     html+="<th>Total</th>";
     html+="<th></th>";
@@ -367,6 +419,8 @@ function tabla(ventas){
       html+="<thead>";
       html+="<tr>";
       if(idioma == "en"){
+
+        html+="<tr>";
         html+="<th>"+"Commodity"+"</th>";
         html+="<th>"+"Loads"+"</th>";
         html+="<th>"+"# Sale"+"</th>";
@@ -374,8 +428,10 @@ function tabla(ventas){
         html+="<th>"+"Quantity"+"</th>";
         html+="<th>"+"Invoice Price"+"</th>";
 
+
         html+="<th>"+"Final Price"+"</th>";
         html+="<th>"+"Final Amount"+"</th>";
+        html+="</tr>"
 
       }else if(idioma == "es"){
         html+="<th>"+"Cultivo"+"</th>";
@@ -587,7 +643,7 @@ function tabla(ventas){
             
           }
         })
-        html+="<tr class='parent beige'>";
+        html+="<tr id='totals-all' class='parent beige'>";
         html+="<td class='white'></td>";
         html+="<td class='white'></td>";
         html+="<td>Carga: "+item[0].FechaVenta;+"</td>";
@@ -602,21 +658,43 @@ function tabla(ventas){
 
 html+="</tbody>";
 html+="</table>";
+
 $("#tabla_loads").html(html);  
 })
+
 $('table.table').each(function() {
   var $table = $(this);
   $table.find('.parent').click(function() {
-            $(this).nextUntil('.parent').toggle(); // must use jQuery 1.4 for nextUntil() method
-          });
+    $(this).nextUntil('.parent').toggle();
+  });
 
   var $childRows = $table.find('tbody tr').not('.parent').hide();
-  $table.find('button.hide').click(function() {
-    $childRows.hide();
-  });
-  $table.find('button.show').click(function() {
-    $childRows.show();
-  });
+
+  /*$table.find('button.show').click(function() {
+    $childRows.toggle();
+  });*/
+});
+
+$('button.show').click(function(){
+  // see if they are all shown
+  var children = $('table tr.blue-light').length;
+  var visibleChildren = $('table tr.blue-light:visible').length;
+  if(children == visibleChildren) { // all the trs are shown
+    $('table tr.blue-light').css('display', 'none');
+    if(idioma == "en"){
+      $("button.show").text("Expand all");
+    } else if(idioma == "es"){
+      $("button.show").text("Expandir");
+    }
+  }
+  else {
+    $('table tr.blue-light').css('display', 'table-row');
+    if(idioma == "en"){
+      $("button.show").text("Collapse");
+    } else if(idioma == "es"){
+      $("button.show").text("Contraer");
+    } 
+  }
 });
 })
 }
@@ -715,6 +793,137 @@ function obtener_bodegas(callbackData) {
   showPage();
 }) 
 */
+
+$("#season").change(function(){
+  $.blockUI({ 
+    message: '',
+    overlayCSS:  { 
+      backgroundColor: '#fff', 
+      opacity:         0.6, 
+      cursor:          'wait' 
+    }, 
+  }); 
+  var temporada = $("#season option:selected").val();
+  var temporada_text = ($(this).find("option:selected").text());
+
+  cultivo = $("#cultivo option:selected").val();
+  bodega = $("#bodega option:selected").val();
+
+  $.ajax({
+    type: "POST",
+    url: "recursos/setTemporada.php",
+    data: { setTemporada : temporada, text : temporada_text} 
+  }).done(function(data){
+
+    var my_json = JSON.parse(data_server)
+    if (cultivo == "todo" && bodega == "todo"  && document.getElementById("season").selectedIndex == 0 || document.getElementById("season").selectedIndex == 1) {
+      tabla(data_server_filtro_agricultor);
+    }else if (temporada.length < 3 && cultivo == "todo" && bodega == "todo") {
+
+      var json= JSON.stringify(data_server_filtro_agricultor);
+      var filtered_json = find_in_object(JSON.parse(json), {CodigoTemporada: temporada});
+      function find_in_object(my_object, my_criteria){
+        return my_object.filter(function(obj) {
+          return Object.keys(my_criteria).every(function(c) {
+            return obj[c] == my_criteria[c];
+          });
+        });
+      }
+      tabla(filtered_json);
+    }else if (bodega != "todo" && cultivo == "todo" && document.getElementById("season").selectedIndex == 0 || document.getElementById("season").selectedIndex == 1 ) {
+      var json= JSON.stringify(data_server_filtro_agricultor);
+      var filtered_json = find_in_object(JSON.parse(json), {NombreBodega: bodega});
+      function find_in_object(my_object, my_criteria){
+        return my_object.filter(function(obj) {
+          return Object.keys(my_criteria).every(function(c) {
+            return obj[c] == my_criteria[c];
+          });
+        });
+      }
+      tabla(filtered_json);
+    }else if (bodega == "todo" && cultivo != "todo" && document.getElementById("season").selectedIndex == 0 || document.getElementById("season").selectedIndex == 1 ) {
+      var json= JSON.stringify(data_server_filtro_agricultor);
+      var filtered_json = find_in_object(JSON.parse(json), {Cultivo: cultivo});
+      function find_in_object(my_object, my_criteria){
+        return my_object.filter(function(obj) {
+          return Object.keys(my_criteria).every(function(c) {
+            return obj[c] == my_criteria[c];
+          });
+        });
+      }
+      
+      tabla(filtered_json);
+    }
+    else if (bodega == "todo" && cultivo == "todo" && season != "todo") {
+      var json= JSON.stringify(data_server_filtro_agricultor);
+      var filtered_json = find_in_object(JSON.parse(json), {CodigoTemporada: season});
+      function find_in_object(my_object, my_criteria){
+        return my_object.filter(function(obj) {
+          return Object.keys(my_criteria).every(function(c) {
+            return obj[c] == my_criteria[c];
+          });
+        });
+      }
+
+      tabla(filtered_json);
+    }else if (bodega =! "todo" && cultivo != "todo" && document.getElementById("season").selectedIndex == 0 || document.getElementById("season").selectedIndex == 1 ) {
+      var json= JSON.stringify(data_server_filtro_agricultor);
+      var filtered_json = find_in_object(JSON.parse(json), {Cultivo: cultivo, NombreBodega: bodega});
+      function find_in_object(my_object, my_criteria){
+        return my_object.filter(function(obj) {
+          return Object.keys(my_criteria).every(function(c) {
+            return obj[c] == my_criteria[c];
+          })
+        });
+      }
+      s
+      tabla(filtered_json);
+    }
+    else if (bodega == "todo" && cultivo != "todo" && season != "todo") {
+      var json= JSON.stringify(data_server_filtro_agricultor);
+      var filtered_json = find_in_object(JSON.parse(json), {Cultivo: cultivo, CodigoTemporada: season});
+      function find_in_object(my_object, my_criteria){
+        return my_object.filter(function(obj) {
+          return Object.keys(my_criteria).every(function(c) {
+            return obj[c] == my_criteria[c];
+          });
+        });
+      }
+
+      tabla(filtered_json);
+    }
+    else if (bodega != "todo" && cultivo == "todo" && season != "todo") {
+      var json= JSON.stringify(data_server_filtro_agricultor);
+      var filtered_json = find_in_object(JSON.parse(json), {NombreBodega: bodega, CodigoTemporada: season});
+      function find_in_object(my_object, my_criteria){
+        return my_object.filter(function(obj) {
+          return Object.keys(my_criteria).every(function(c) {
+            return obj[c] == my_criteria[c];
+          });
+        });
+      }
+
+      tabla(filtered_json);
+    }
+    else{
+      var json= JSON.stringify(data_server_filtro_agricultor);
+      var filtered_json = find_in_object(JSON.parse(json), {NombreBodega: bodega, Cultivo: cultivo, CodigoTemporada: season});
+      function find_in_object(my_object, my_criteria){
+        return my_object.filter(function(obj) {
+          return Object.keys(my_criteria).every(function(c) {
+            return obj[c] == my_criteria[c];
+          });
+        });
+      }
+
+      tabla(filtered_json);
+    }
+    $.unblockUI();
+    showPage();
+  })
+})
+
+
 $("#bodega").change(function(){
   $.blockUI({ 
     message: '',

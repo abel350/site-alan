@@ -37,6 +37,7 @@ obtener_agricultores(function(agri){
       data_server = agri;
       myFunction();
       obtener_bodegas(function(cultivo){
+        console.log(cultivo);
         obtener_idioma(function(idioma){
           var miJSON = cultivo;
           if(idioma =="en"){
@@ -178,7 +179,7 @@ $("#filtro").change(function(){
       })             
     })
     obtener_cultivos(function(cultivo){
-
+      console.log(cultivo);
       obtener_idioma(function(idioma){
         $("#cultivo").html('');
         var miJSON = cultivo;
@@ -470,16 +471,21 @@ function tabla(ventas){
       html+="<td>"+numberWithCommas(final_total_price,2)+"</td>";
       html+="</tr>"; 
 
-      
+      var sum_cantidad_frontera_beige=0;
+      var sum_sin_facturar_beige = 0;
+      var sum_facturado_beige = 0;
+
+      var sum_precio_facturado_beige=0;
+      var sum_precio_liquidado_beige=0;
+
+      var sum_precio_facturado_beige_2 =0;
 
       var sale = _.groupBy(sales[frontera], function(d) {
         return /*d.CodigoCarga + "-" +  d.Producto  + "-" + */d.CodigoCarga;
       });
 
-      _.forEachRight(sale, function(item) {
-      //$.each(sale, function(i,item) {
-        
-        sum_sin_facturar_beige_Ss=0;
+      $.each(sale, function(i,item) {
+        sum_sin_facturar_beige=0;
         sum_cantidad_frontera_beige=0;
         sum_facturado_beige=0;
         sum_precio_facturado_beige=0;
@@ -494,30 +500,30 @@ function tabla(ventas){
         total_precio_facturado_json2= 0;
         total_precio_liquidado_json2= 0;
         sum_cantidad_frontera_beige2=0;
-        sum_cantidad_facturado_frontera_fl=0;
+        sum_cantidad_facturado_frontera=0;
+        sum_sin_facturar_beige=0;
 
         for (var j = 0; j < item.length; j++) {
+
           final_amount2 = final_amount2 + item[j].ImporteLiquidado;
 
           precio_facturado = item[j].ImporteFacturado / item[j].CantidadFacturado;
           precio_liquidado = item[j].ImporteLiquidado / item[j].CantidadFacturado;
 
           sum_invoiced_frontera = sum_invoiced_frontera + item[j].ImporteFacturado;
-          sum_cantidad_facturado_frontera_fl = sum_cantidad_facturado_frontera_fl + item[j].CantidadFacturado;
-          sum_sin_facturar_beige_Ss = sum_sin_facturar_beige_Ss + item[j].CantidadSinFacturar;          
+          sum_cantidad_facturado_frontera = sum_cantidad_facturado_frontera + item[j].CantidadFacturado;
+          sum_sin_facturar_beige = sum_sin_facturar_beige + item[j].CantidadSinFacturar;
 
           total_ImporteLiquidado_json2 = total_ImporteLiquidado_json2 + item[j].ImporteLiquidado;
           total_ImporteFacturado_json2 = total_ImporteFacturado_json2 + item[j].ImporteFacturado;
           sum_cantidad_frontera_beige2 = sum_cantidad_frontera_beige2 + item[j].Cantidad;
         }
-
-        total_precio_facturado_json2 = total_ImporteFacturado_json2/sum_cantidad_facturado_frontera_fl;
-        total_precio_liquidado_json2 =total_ImporteLiquidado_json2 / sum_cantidad_facturado_frontera_fl;
+        total_precio_facturado_json2 = total_ImporteFacturado_json2/sum_cantidad_frontera_beige2;
+        total_precio_liquidado_json2 =total_ImporteLiquidado_json2 / sum_cantidad_frontera_beige2;
 
         var json_producto = _.groupBy(item, function(d) {
           return d.FechaEmbarque + "-" +  d.Producto;
         });
-        
         $.each(json_producto, function(i,item) {
           sum_cantidad_frontera_beige=0;
           sum_precio_facturado_beige=0;
@@ -526,8 +532,6 @@ function tabla(ventas){
           sum_invoiced_frontera=0;
           final_amount=0;
           sum_sin_facturar_beige2=0;
-          sum_precio_facturado_beige_s=0;
-          sum_precio_liquidado_beige_s=0;
 
           for (var j = 0; j < item.length; j++) {
             final_amount = final_amount + item[j].ImporteLiquidado;
@@ -540,9 +544,6 @@ function tabla(ventas){
             sum_precio_liquidado_beige = item[j].ImporteLiquidado / item[j].Cantidad;
             sum_sin_facturar_beige2 = sum_sin_facturar_beige2 + item[j].CantidadSinFacturar;
           }
-          sum_precio_facturado_beige_s = sum_invoiced_frontera / sum_facturado_beige;
-          sum_precio_liquidado_beige_s = final_amount / sum_cantidad_frontera_beige; 
-
           html+="<tr class='data-total parent tr-white'>";
           html+="<td>"+item[0].CodigoCarga;+"</td>";
           html+="<td>"+item[0].Producto;+"</td>";
@@ -558,6 +559,7 @@ function tabla(ventas){
           html+="</tr>";  
 
           for (var j = 0; j < item.length; j++) {
+
             final_price = final_price + item[j].PrecioLiquidado;
             final_amount = final_amount + item[j].ImporteLiquidado;
 
@@ -568,25 +570,29 @@ function tabla(ventas){
             precio_liquidado = item[j].ImporteLiquidado / item[j].CantidadFacturado;
 
             sum_cantidad_frontera_beige = sum_cantidad_frontera_beige + item[j].Cantidad;
-            //sum_sin_facturar_beige = sum_sin_facturar_beige + item[j].CantidadSinFacturar;
-            sum_facturado_beige = sum_facturado_beige + item[j].CantidadFacturado;                     
+            sum_sin_facturar_beige = sum_sin_facturar_beige + item[j].CantidadSinFacturar;
+            sum_facturado_beige = sum_facturado_beige + item[j].CantidadFacturado;
+
+            sum_precio_facturado_beige = sum_invoiced_frontera / sum_cantidad_facturado_frontera;
+            sum_precio_liquidado_beige = final_amount / sum_cantidad_facturado_frontera;           
 
             html+="<tr class='data-single   blue-light'>";
             html+="<td class='white'></td>";
             html+="<td class='white'></td>";
             if(idioma == "en"){
-              html+="<td>Inovoice Date: "+item[j].FechaVenta+"</td>";
+              html+="<td>Inovoice Date: "+item[j].FechaRecepcion+"</td>";
             }if(idioma == "es"){
-              html+="<td>Fecha Factura: "+item[j].FechaVenta+"</td>";
+              html+="<td>Fecha Factura: "+item[j].FechaRecepcion+"</td>";
             }
             html+="<td></td>";
             html+="<td>"+item[j].Cantidad;+"</td>";
             html+="<td>"+item[j].CantidadSinFacturar;+"</td>";
             html+="<td>"+item[j].CantidadFacturado;+"</td>";
-            html+="<td>"+numberWithCommas(item[j].PrecioFacturado,2)+"</td>";
-            html+="<td>"+numberWithCommas(item[j].PrecioLiquidado,2)+"</td>";
+            html+="<td>"+numberWithCommas(precio_facturado,2)+"</td>";
+            html+="<td>"+numberWithCommas(total_precio_liquidado_json2,2)+"</td>";
             html+="<td>"+numberWithCommas(item[j].ImporteLiquidado,2)+"</td>";
             html+="</tr>";        
+
           }   
 
         })
@@ -596,8 +602,8 @@ function tabla(ventas){
         html+="<td>Total</td>";
         html+="<td></td>";
         html+="<td >"+numberWithCommas(sum_cantidad_frontera_beige2)+"</td>";
-        html+="<td>"+numberWithCommas(sum_sin_facturar_beige_Ss)+"</td>";
-        html+="<td>"+numberWithCommas(sum_cantidad_facturado_frontera_fl)+"</td>";
+        html+="<td>"+numberWithCommas(sum_sin_facturar_beige)+"</td>";
+        html+="<td>"+numberWithCommas(sum_cantidad_facturado_frontera)+"</td>";
 
         html+="<td>"+numberWithCommas(total_precio_facturado_json2,2)+"</td>";
         html+="<td>"+numberWithCommas(total_precio_liquidado_json2,2)+"</td>";
