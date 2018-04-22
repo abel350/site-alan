@@ -1,12 +1,13 @@
 var data_ventas
 var data_server;
 var temporadaok;
+var idagricultor = "";
 
 obtener_temporada(function(season){
   temporadaok = season;
 })
 obtener_agricultores(function(agri){
-  var idagricultor = "";
+  idagricultor = "";
   var miJSON = agri;
   for(var i in miJSON.agricultores) { 
     idagricultor = idagricultor+miJSON.agricultores[i].codigoAgricultor +",";
@@ -20,7 +21,7 @@ obtener_agricultores(function(agri){
   .done(function(data){
   });
   obtener_ventas(function(ventas){
-    if(temporadaok.length > 3){
+    if(temporadaok.length >=2){
       data_ventas = ventas;
     }else { 
       data = find_in_object(JSON.parse(ventas), {CodigoTemporada: temporadaok});
@@ -38,6 +39,17 @@ obtener_agricultores(function(agri){
       myFunction();
       obtener_bodegas(function(cultivo){
         obtener_idioma(function(idioma){
+          if(idioma == "en"){
+            var meses = new Array ("January","February","March","April","May","June","July","August","September","October","November","December");
+            var diasSemana = new Array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");
+
+          }if(idioma == "es"){
+            var meses = new Array ("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
+            var diasSemana = new Array("Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado");    
+          }
+          var f=new Date();
+          $('.fecha').text(diasSemana[f.getDay()] + ", " + f.getDate() + " " + meses[f.getMonth()] + " " + f.getFullYear()+ " " + f.getHours()+":"+f.getMinutes());
+
           var miJSON = cultivo;
           if(idioma =="en"){
             $("#bodega").append('<option id="option_b" value="todo"> -- Select an option -- </option>');
@@ -62,59 +74,33 @@ obtener_agricultores(function(agri){
 
       obtener_idioma(function(idioma){
         obtener_role(function(rol){
-          if (rol == "Administrador") {
-            var miJSON = JSON.parse(data_server);
-            if(idioma =="en"){
-              $("#filtro").append('<option id="option2" value="'+idagricultor+'"> -- Select an option -- </option>');
-              $("#filtro").append('<option id="filter_agricultor" value="'+idagricultor+'">No Filter</option>');
-            }else if(idioma =="es"){
-              $("#filtro").append('<option id="option2" value="'+idagricultor+'"> -- Selecciona una opción -- </option>');
-              $("#filtro").append('<option id="filter_agricultor" value="'+idagricultor+'">Sin Filtro</option>');
-            }
-            $( "#filtro" ).change(function() {
-              $("select option:selected").val();
-            }).trigger( "change" );
 
-            var codigos_embarques="";
-            var miJSON2 = agri;
-            for(var i in miJSON) {
-              var regex = new RegExp('\\b' + miJSON[i].CodigoAgricultor + '\\b');
-              if(codigos_embarques.search(regex) < 0){
-                $("#filtro").append('<option value="'+miJSON[i].CodigoAgricultor+'">'+miJSON[i].Nombre+'</option>');
-                codigos_embarques += miJSON[i].CodigoAgricultor +",";
-              }           
-            }
-          }else{
-            var miJSON = agri;
-            for(var i in miJSON.agricultores) { 
-              idagricultor += miJSON.agricultores[i].codigoAgricultor +",";
-            }
-            if(idioma =="en"){
-              $("#filtro").append('<option id="option2" value="'+idagricultor+'"> -- Select an option -- </option>');
-              $("#filtro").append('<option id="filter_agricultor" value="'+idagricultor+'">No Filter</option>');
-            }else if(idioma =="es"){
-              $("#filtro").append('<option id="option2" value="'+idagricultor+'"> -- Selecciona una opción -- </option>');
-              $("#filtro").append('<option id="filter_agricultor" value="'+idagricultor+'">Sin Filtro</option>');
-            }
-
-            $( "#filtro" ).change(function() {
-              $("select option:selected").val();
-            }).trigger( "change" );
-
-            var result = JSON.parse(data_server);
-            var res2 = _.groupBy(result, 'CodigoAgricultor')
-            $.each(res2, function(i, item) {
-              for(ii in miJSON.agricultores) {
-                if (i == miJSON.agricultores[ii].codigoAgricultor )  {   
-                  $("#filtro").append('<option value="'+miJSON.agricultores[ii].codigoAgricultor+'">'+miJSON.agricultores[ii].nombre+'</option>');          
-                }
-              }
-            })
+          var miJSON = JSON.parse(data_server);
+          if(idioma =="en"){
+            $("#filtro").append('<option id="option2" value="'+idagricultor+'"> -- Select an option -- </option>');
+            $("#filtro").append('<option id="filter_agricultor" value="'+idagricultor+'">No Filter</option>');
+          }else if(idioma =="es"){
+            $("#filtro").append('<option id="option2" value="'+idagricultor+'"> -- Selecciona una opción -- </option>');
+            $("#filtro").append('<option id="filter_agricultor" value="'+idagricultor+'">Sin Filtro</option>');
           }
+          $( "#filtro" ).change(function() {
+            $("select option:selected").val();
+          }).trigger( "change" );
+
+          var codigos_embarques="";
+          var miJSON2 = agri;
+          for(var i in miJSON) {
+            var regex = new RegExp('\\b' + miJSON[i].CodigoAgricultor + '\\b');
+            if(codigos_embarques.search(regex) < 0){
+              $("#filtro").append('<option value="'+miJSON[i].CodigoAgricultor+'">'+miJSON[i].Nombre+'</option>');
+              codigos_embarques += miJSON[i].CodigoAgricultor +",";
+            }           
+          }
+          
         })       
       })
     })
-});
+  });
 });
 
 
@@ -174,6 +160,11 @@ $("#filtro").change(function(){
           else{         
             $("#season").append('<option value="'+miJSON[i].CodigoTemporada+'">'+miJSON[i].NombreTemporada+'</option>');
           }
+        }
+        if(temporadaok.length > 2){
+          $('#season :nth-child(1)').prop('selected', true); // To select via index
+        }else { 
+          $('#season :nth-child(3)').prop('selected', true); // To select via index
         }  
       })             
     })
@@ -478,7 +469,7 @@ function tabla(ventas){
 
       _.forEachRight(sale, function(item) {
       //$.each(sale, function(i,item) {
-        
+
         sum_sin_facturar_beige_Ss=0;
         sum_cantidad_frontera_beige=0;
         sum_facturado_beige=0;
@@ -1015,5 +1006,6 @@ $('.Mostrar_Tabla').on('click',function(){
 
 
 $(document).ready(function() {
+
 
 });

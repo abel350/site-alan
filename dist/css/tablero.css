@@ -636,3 +636,7 @@ tbody tr.tr-white:nth-child(odd){
   text-align: left;
   float: left;
 }
+
+i.fa.fa-info-circle.info {
+    margin-top: 3px;
+}

@@ -13,11 +13,17 @@ $(document).ready(function() {
           "key_inventory": "Inventory",
           "key_loads": "Loads",
           "key_sales": "Sales",
+          "key_v": "Price by load",
+          "key_vf": "Price by sold date",
+          "key_vff": "Price by invoice date",
           "key_commodity_eval": "Quality Control",
           "key_financial": "Financial Statments",
           "key_new_tripleh": "TripleH News",
           "key_about": "About Site",
           "key_loguot": "Log Out",
+
+          "key_lcommodity": "Filter by Commodity",
+          "key_lcontract": "Filter by Contract",     
 
           //-----END MENU 
           "key_welcome": "Welcome: ",
@@ -66,6 +72,10 @@ $(document).ready(function() {
           "key_inventory": "Inventario",
           "key_loads": "Cargas",
           "key_sales": "Ventas",
+          "key_v": "Reporte de precios por carga",
+          "key_vf": "Reporte de precios por fecha venta",
+          "key_vff": "Reporte de precio por fecha factura",
+
           "key_commodity_eval": "Control de Calidad",
           "key_financial": "Estados de Cuenta",
           "key_new_tripleh": "Noticias TripleH",
@@ -114,6 +124,10 @@ $(document).ready(function() {
 
           "key_Price": "Precio",
           "key_pPrice": "Precio de venta de la orden",
+
+          "key_lcommodity": "Filtro por Cultivo",
+
+          "key_lcontract": "Filtro por Contrato",          
         }
       }
     }
@@ -122,12 +136,12 @@ $(document).ready(function() {
   updateContent();
 });
 
-    function updateContent() {
-      document.getElementById('spanish').innerHTML = i18next.t('key_spanish');
-      document.getElementById('english').innerHTML = i18next.t('key_english');
+function updateContent() {
+  document.getElementById('spanish').innerHTML = i18next.t('key_spanish');
+  document.getElementById('english').innerHTML = i18next.t('key_english');
 
-      document.getElementById('inventory').innerHTML = i18next.t('key_inventory');
-      document.getElementById('lloads').innerHTML = i18next.t('key_loads');
+  document.getElementById('inventory').innerHTML = i18next.t('key_inventory');
+  document.getElementById('lloads').innerHTML = i18next.t('key_loads');
       //document.getElementById('sales').innerHTML = i18next.t('key_sales');
       document.getElementById('commodity_eval').innerHTML = i18next.t('key_commodity_eval');
       document.getElementById('financial').innerHTML = i18next.t('key_financial');
@@ -166,6 +180,18 @@ $(document).ready(function() {
 
       document.getElementById('ltprice').innerHTML = i18next.t('key_Price');
       document.getElementById('pltprice').innerHTML = i18next.t('key_pPrice');
+
+      document.getElementById('sales').innerHTML = i18next.t('key_sales');
+      document.getElementById('v').innerHTML = i18next.t('key_v');
+      document.getElementById('vf').innerHTML = i18next.t('key_vf');
+      document.getElementById('vff').innerHTML = i18next.t('key_vff');
+
+      document.getElementById('lcommodity').innerHTML = i18next.t('key_lcommodity');
+      document.getElementById('lcontract').innerHTML = i18next.t('key_lcontract');
+      document.getElementById('price').innerHTML = i18next.t('key_Price');
+
+      
+
 
     }
 

@@ -91,10 +91,10 @@ if(!isset($_SESSION['usuario']) and $_SESSION['estado'] != 'Autenticado') {
                 <li class="active dropdown">
                   <a id="sales" href="#" class="dropdown-toggle" data-toggle="dropdown">Sales <b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li><a href="sales.php">Price</a></li>
-                    <li><a tabindex="-1" href="facturas-venta.php">Price by Load</a></li>
-                    <li><a tabindex="-1" href="facturas-venta-fecha.php">Price by Sold Date</a></li>
-                    <li><a tabindex="-1" href="facturas-venta-fecha-factura.php">Price by Invoice Date</a></li>
+                    <li><a id="price" href="sales.php">Price</a></li>
+                    <li><a id="v" tabindex="-1" href="facturas-venta.php">Price by Load</a></li>
+                    <li><a id="vf" tabindex="-1" href="facturas-venta-fecha.php">Price by Sold Date</a></li>
+                    <li><a id="vff" tabindex="-1" href="facturas-venta-fecha-factura.php">Price by Invoice Date</a></li>
                   </ul>
                 </li>  
                 <li><a id="commodity_eval" href ="#" data-toggle="tooltip" title="Soon" data-placement="right">Commodity Control</a></li>
@@ -118,9 +118,18 @@ if(!isset($_SESSION['usuario']) and $_SESSION['estado'] != 'Autenticado') {
         <div class="panel panel-primary">
           <div class="panel-heading">
             <!-- <h4>Mi tablero</h4> -->
-            <div id="filter-season"><i class="fa fa-filter">:</i> <b><?php echo $temporada; ?></b> </div>
-            <div><span id="welcome">Welcome:</span> <b><?php echo $nombre; ?></b> </div>
-            <a data-toggle="modal" href="#stack9" class=""><i class="fa fa-info-circle info" aria-hidden="true"></i></a>
+            <div class="row">
+              <div class="col-lg-4 col-md-12 col-sm-12">
+                <div id="filter-season"><i class="fa fa-filter">:</i> <b><?php echo $temporada; ?></b> </div>
+              </div>
+              <div class="col-lg-4 col-md-12 col-sm-12">
+                <div><span id="welcome">Welcome:</span> <b><?php echo $nombre; ?></b> </div>
+              </div>
+              <div class="col-lg-4 col-md-12 col-sm-12">
+                <span class="fecha"></span>
+                <a data-toggle="modal" href="#stack9" class=""><i class="fa fa-info-circle info" aria-hidden="true"></i></a>
+              </div>
+            </div>
           </div>
           <div class="panel-body">
             <div class="row">
